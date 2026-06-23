@@ -1,0 +1,500 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA0001 /* ReptilPlusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002; };
+		AA0003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0004; };
+		AA0005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0006; };
+		AA0007 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA0008; };
+		AA0009 /* AuthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0010; };
+		AA0015 /* Modelo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0016; };
+		AA0017 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0018; };
+		AA0019 /* usuarios.json in Resources */ = {isa = PBXBuildFile; fileRef = AA0020; };
+		AA0021 /* especies.json in Resources */ = {isa = PBXBuildFile; fileRef = AA0022; };
+		AA0023 /* reptiles.json in Resources */ = {isa = PBXBuildFile; fileRef = AA0024; };
+		BB0001 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0002; };
+		BB0003 /* RegistroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0004; };
+		BB0005 /* MainTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0006; };
+		BB0007 /* InicioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0008; };
+		BB0009 /* ReptilesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0010; };
+		BB0011 /* DetalleReptilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0012; };
+		BB0013 /* EditarEstadoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0014; };
+		BB0015 /* FavoritosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0016; };
+		BB0017 /* CuidadosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0018; };
+		BB0019 /* EstadisticasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0020; };
+		BB0021 /* MapaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0022; };
+		BB0023 /* OpinionesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0024; };
+		BB0025 /* AcercaDeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0026; };
+		BB0027 /* NuevoReptilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0028; };
+		BB0029 /* ReptilesPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0030; };
+		BB0031 /* EspecieDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0032; };
+		BB0033 /* EspecieWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0034; };
+		BB0035 /* ReptilCustomRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0036; };
+		BB0037 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0038; };
+		BB0039 /* RemoteDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0040; };
+		BB0041 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0042; };
+		CC0001 /* PerfilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0002; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA0002 /* ReptilPlusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReptilPlusApp.swift; sourceTree = "<group>"; };
+		AA0004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AA0006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA0008 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		AA0010 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
+		AA0016 /* Modelo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modelo.swift; sourceTree = "<group>"; };
+		AA0018 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		AA0020 /* usuarios.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = usuarios.json; sourceTree = "<group>"; };
+		AA0022 /* especies.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = especies.json; sourceTree = "<group>"; };
+		AA0024 /* reptiles.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = reptiles.json; sourceTree = "<group>"; };
+		AAAPP1 /* ReptilPlus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReptilPlus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0002 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		BB0004 /* RegistroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistroView.swift; sourceTree = "<group>"; };
+		BB0006 /* MainTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabsView.swift; sourceTree = "<group>"; };
+		BB0008 /* InicioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InicioView.swift; sourceTree = "<group>"; };
+		BB0010 /* ReptilesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReptilesListView.swift; sourceTree = "<group>"; };
+		BB0012 /* DetalleReptilView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetalleReptilView.swift; sourceTree = "<group>"; };
+		BB0014 /* EditarEstadoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditarEstadoView.swift; sourceTree = "<group>"; };
+		BB0016 /* FavoritosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosView.swift; sourceTree = "<group>"; };
+		BB0018 /* CuidadosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuidadosView.swift; sourceTree = "<group>"; };
+		BB0020 /* EstadisticasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstadisticasView.swift; sourceTree = "<group>"; };
+		BB0022 /* MapaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapaView.swift; sourceTree = "<group>"; };
+		BB0024 /* OpinionesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpinionesView.swift; sourceTree = "<group>"; };
+		BB0026 /* AcercaDeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcercaDeView.swift; sourceTree = "<group>"; };
+		BB0028 /* NuevoReptilView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NuevoReptilView.swift; sourceTree = "<group>"; };
+		BB0030 /* ReptilesPagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReptilesPagerView.swift; sourceTree = "<group>"; };
+		BB0032 /* EspecieDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EspecieDetailView.swift; sourceTree = "<group>"; };
+		BB0034 /* EspecieWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EspecieWebView.swift; sourceTree = "<group>"; };
+		BB0036 /* ReptilCustomRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReptilCustomRow.swift; sourceTree = "<group>"; };
+		BB0038 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
+		BB0040 /* RemoteDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDataService.swift; sourceTree = "<group>"; };
+		BB0042 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
+		CC0002 /* PerfilView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerfilView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AAFWK1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AAROOT = {
+			isa = PBXGroup;
+			children = (
+				AAMAIN /* ReptilPlus */,
+				AAPROD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AAMAIN /* ReptilPlus */ = {
+			isa = PBXGroup;
+			children = (
+				AA0002 /* ReptilPlusApp.swift */,
+				AA0004 /* ContentView.swift */,
+				AA0008 /* LaunchScreen.storyboard */,
+				AA0006 /* Assets.xcassets */,
+				AAAUTH /* Auth */,
+				AAMODELS /* Models */,
+				AAVIEWS /* Views */,
+				AACOMP /* Components */,
+				AASERV /* Services */,
+				AARSRC /* Resources */,
+			);
+			path = ReptilPlus;
+			sourceTree = "<group>";
+		};
+		AAAUTH /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				AA0010 /* AuthStore.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		AAMODELS /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA0016 /* Modelo.swift */,
+				AA0018 /* AppState.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AAVIEWS /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BB0002 /* LoginView.swift */,
+				BB0004 /* RegistroView.swift */,
+				BB0006 /* MainTabsView.swift */,
+				BB0008 /* InicioView.swift */,
+				BB0010 /* ReptilesListView.swift */,
+				BB0012 /* DetalleReptilView.swift */,
+				BB0014 /* EditarEstadoView.swift */,
+				BB0016 /* FavoritosView.swift */,
+				BB0018 /* CuidadosView.swift */,
+				BB0020 /* EstadisticasView.swift */,
+				BB0022 /* MapaView.swift */,
+				BB0024 /* OpinionesView.swift */,
+				BB0026 /* AcercaDeView.swift */,
+				BB0028 /* NuevoReptilView.swift */,
+				BB0030 /* ReptilesPagerView.swift */,
+				BB0032 /* EspecieDetailView.swift */,
+				BB0034 /* EspecieWebView.swift */,
+				CC0002 /* PerfilView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AACOMP /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				BB0036 /* ReptilCustomRow.swift */,
+				BB0038 /* WebView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		AASERV /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				BB0040 /* RemoteDataService.swift */,
+				BB0042 /* UserPreferences.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AARSRC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA0020 /* usuarios.json */,
+				AA0022 /* especies.json */,
+				AA0024 /* reptiles.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AAPROD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AAAPP1 /* ReptilPlus.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AATARG /* ReptilPlus */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AACFGL;
+			buildPhases = (
+				AASRCS /* Sources */,
+				AAFWK1 /* Frameworks */,
+				AARSRS /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ReptilPlus;
+			productName = ReptilPlus;
+			productReference = AAAPP1 /* ReptilPlus.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AAPROJ /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					AATARG = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = AAPRCL;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = es;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				es,
+			);
+			mainGroup = AAROOT;
+			productRefGroup = AAPROD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AATARG /* ReptilPlus */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AARSRS /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0005 /* Assets.xcassets in Resources */,
+				AA0007 /* LaunchScreen.storyboard in Resources */,
+				AA0019 /* usuarios.json in Resources */,
+				AA0021 /* especies.json in Resources */,
+				AA0023 /* reptiles.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AASRCS /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0001 /* ReptilPlusApp.swift in Sources */,
+				AA0003 /* ContentView.swift in Sources */,
+				AA0009 /* AuthStore.swift in Sources */,
+				AA0015 /* Modelo.swift in Sources */,
+				AA0017 /* AppState.swift in Sources */,
+				BB0001 /* LoginView.swift in Sources */,
+				BB0003 /* RegistroView.swift in Sources */,
+				BB0005 /* MainTabsView.swift in Sources */,
+				BB0007 /* InicioView.swift in Sources */,
+				BB0009 /* ReptilesListView.swift in Sources */,
+				BB0011 /* DetalleReptilView.swift in Sources */,
+				BB0013 /* EditarEstadoView.swift in Sources */,
+				BB0015 /* FavoritosView.swift in Sources */,
+				BB0017 /* CuidadosView.swift in Sources */,
+				BB0019 /* EstadisticasView.swift in Sources */,
+				BB0021 /* MapaView.swift in Sources */,
+				BB0023 /* OpinionesView.swift in Sources */,
+				BB0025 /* AcercaDeView.swift in Sources */,
+				BB0027 /* NuevoReptilView.swift in Sources */,
+				BB0029 /* ReptilesPagerView.swift in Sources */,
+				BB0031 /* EspecieDetailView.swift in Sources */,
+				BB0033 /* EspecieWebView.swift in Sources */,
+				BB0035 /* ReptilCustomRow.swift in Sources */,
+				BB0037 /* WebView.swift in Sources */,
+				BB0039 /* RemoteDataService.swift in Sources */,
+				BB0041 /* UserPreferences.swift in Sources */,
+				CC0001 /* PerfilView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AADEBG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Usada para mostrar la ubicación de los terrarios en el mapa.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "LaunchScreen";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.andreaguillen.ReptilPlus;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AARELS /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Usada para mostrar la ubicación de los terrarios en el mapa.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "LaunchScreen";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.andreaguillen.ReptilPlus;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AAPCDB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AAPCRL /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AACFGL /* Build configuration list for PBXNativeTarget "ReptilPlus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AADEBG /* Debug */,
+				AARELS /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAPRCL /* Build configuration list for PBXProject "ReptilPlus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAPCDB /* Debug */,
+				AAPCRL /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AAPROJ /* Project object */;
+}

@@ -1,0 +1,22 @@
+{
+  "usuarios": [
+    {
+      "id": "U1A2B3C4-D5E6-F789-0ABC-DEF123456789",
+      "username": "andrea",
+      "password": "1234",
+      "email": "andrea@reptilplus.app",
+      "nombre": "Andrea Guillén",
+      "telefono": "+34 600 000 001",
+      "createdAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "U2B3C4D5-E6F7-8901-BCDE-F234567890AB",
+      "username": "demo",
+      "password": "demo",
+      "email": "demo@reptilplus.app",
+      "nombre": "Usuario Demo",
+      "telefono": "+34 600 000 002",
+      "createdAt": "2026-01-15T10:00:00Z"
+    }
+  ]
+}
