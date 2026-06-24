@@ -20,7 +20,7 @@
       "longitudActual": 48.0,
       "sexo": "hembra",
       "estado": "saludable",
-      "notas": "Muy dócil, le encanta tomar el sol"
+      "notas": "Muy docil, le encanta tomar el sol"
     },
     {
       "id": "a3c4d5e6-f789-0123-cdef-34567890abc0",
@@ -53,7 +53,7 @@
       "longitudActual": 42.0,
       "sexo": "macho",
       "estado": "saludable",
-      "notas": "Cambia de color según su humor"
+      "notas": "Cambia de color segun su humor"
     },
     {
       "id": "a6f78901-2345-6789-0123-67890abcdef0",
@@ -64,7 +64,7 @@
       "longitudActual": 140.0,
       "sexo": "hembra",
       "estado": "saludable",
-      "notas": "Patrón de colores muy bonito"
+      "notas": "Patron de colores muy bonito"
     },
     {
       "id": "a7890123-4567-8901-1234-7890abcdef01",
@@ -86,7 +86,7 @@
       "longitudActual": 52.0,
       "sexo": "macho",
       "estado": "saludable",
-      "notas": "Muy curioso, lengua azul característica"
+      "notas": "Muy curioso, lengua azul caracteristica"
     },
     {
       "id": "a9012345-6789-0123-3456-90abcdef0123",
@@ -109,6 +109,61 @@
       "sexo": "macho",
       "estado": "saludable",
       "notas": "Ejemplar grande y tranquilo"
+    },
+    {
+      "id": "b1234567-1234-1234-1234-b12345678901",
+      "nombre": "Nala",
+      "especieId": "a1b2c3d4-e5f6-7890-abcd-1234567890a1",
+      "fechaNacimiento": "2024-05-01T09:00:00Z",
+      "pesoActual": 45.0,
+      "longitudActual": 17.0,
+      "sexo": "hembra",
+      "estado": "saludable",
+      "notas": "La mas joven de la coleccion"
+    },
+    {
+      "id": "b2345678-2345-2345-2345-b23456789012",
+      "nombre": "Titan",
+      "especieId": "b2c3d4e5-f678-9012-bcde-234567890ab2",
+      "fechaNacimiento": "2021-03-10T11:00:00Z",
+      "pesoActual": 520.0,
+      "longitudActual": 55.0,
+      "sexo": "macho",
+      "estado": "enfermo",
+      "notas": "En tratamiento veterinario por infeccion respiratoria"
+    },
+    {
+      "id": "b3456789-3456-3456-3456-b34567890123",
+      "nombre": "Esmeralda",
+      "especieId": "e5f67890-1234-5678-ef01-567890abcde5",
+      "fechaNacimiento": "2022-08-15T14:00:00Z",
+      "pesoActual": 145.0,
+      "longitudActual": 38.0,
+      "sexo": "hembra",
+      "estado": "saludable",
+      "notas": "Colores verdes intensos, muy fotogenica"
+    },
+    {
+      "id": "b4567890-4567-4567-4567-b45678901234",
+      "nombre": "Brutus",
+      "especieId": "b7890123-4567-8901-1234-7890abcdef07",
+      "fechaNacimiento": "2019-11-20T10:00:00Z",
+      "pesoActual": 3200.0,
+      "longitudActual": 145.0,
+      "sexo": "macho",
+      "estado": "observacion",
+      "notas": "Mayor de la coleccion, vigilar articulaciones"
+    },
+    {
+      "id": "b5678901-5678-5678-5678-b56789012345",
+      "nombre": "Perla",
+      "especieId": "a6789012-3456-7890-0123-67890abcdef6",
+      "fechaNacimiento": "2023-12-01T08:00:00Z",
+      "pesoActual": 280.0,
+      "longitudActual": 95.0,
+      "sexo": "hembra",
+      "estado": "saludable",
+      "notas": "Morfo anerythistic, blanco y gris"
     }
   ]
 }
