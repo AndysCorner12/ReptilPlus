@@ -1,0 +1,114 @@
+{
+  "reptiles": [
+    {
+      "id": "a1b2c3d4-d5e6-f789-0abc-def123456780",
+      "nombre": "Rocky",
+      "especieId": "a1b2c3d4-e5f6-7890-abcd-1234567890a1",
+      "fechaNacimiento": "2023-03-15T10:00:00Z",
+      "pesoActual": 65.5,
+      "longitudActual": 24.0,
+      "sexo": "macho",
+      "estado": "saludable",
+      "notas": "Muy activo, come bien"
+    },
+    {
+      "id": "a2b3c4d5-e6f7-8901-bcde-f23456789001",
+      "nombre": "Smaug",
+      "especieId": "b2c3d4e5-f678-9012-bcde-234567890ab2",
+      "fechaNacimiento": "2024-01-10T12:00:00Z",
+      "pesoActual": 385.0,
+      "longitudActual": 48.0,
+      "sexo": "hembra",
+      "estado": "saludable",
+      "notas": "Muy dócil, le encanta tomar el sol"
+    },
+    {
+      "id": "a3c4d5e6-f789-0123-cdef-34567890abc0",
+      "nombre": "Monty",
+      "especieId": "c3d4e5f6-7890-1234-cdef-34567890abc3",
+      "fechaNacimiento": "2022-06-20T14:30:00Z",
+      "pesoActual": 1450.0,
+      "longitudActual": 125.0,
+      "sexo": "desconocido",
+      "estado": "observacion",
+      "notas": "Pendiente de veterinario"
+    },
+    {
+      "id": "a4d5e6f7-8901-2345-def0-4567890abcd0",
+      "nombre": "Luna",
+      "especieId": "d4e5f678-9012-3456-def0-4567890abcd4",
+      "fechaNacimiento": "2023-09-05T16:00:00Z",
+      "pesoActual": 42.0,
+      "longitudActual": 18.0,
+      "sexo": "hembra",
+      "estado": "saludable",
+      "notas": ""
+    },
+    {
+      "id": "a5e6f789-0123-4567-ef01-567890abcde0",
+      "nombre": "Pascal",
+      "especieId": "e5f67890-1234-5678-ef01-567890abcde5",
+      "fechaNacimiento": "2023-07-22T08:00:00Z",
+      "pesoActual": 180.0,
+      "longitudActual": 42.0,
+      "sexo": "macho",
+      "estado": "saludable",
+      "notas": "Cambia de color según su humor"
+    },
+    {
+      "id": "a6f78901-2345-6789-0123-67890abcdef0",
+      "nombre": "Coral",
+      "especieId": "a6789012-3456-7890-0123-67890abcdef6",
+      "fechaNacimiento": "2023-05-12T11:00:00Z",
+      "pesoActual": 450.0,
+      "longitudActual": 140.0,
+      "sexo": "hembra",
+      "estado": "saludable",
+      "notas": "Patrón de colores muy bonito"
+    },
+    {
+      "id": "a7890123-4567-8901-1234-7890abcdef01",
+      "nombre": "Rex",
+      "especieId": "b7890123-4567-8901-1234-7890abcdef07",
+      "fechaNacimiento": "2021-08-30T09:30:00Z",
+      "pesoActual": 4500.0,
+      "longitudActual": 165.0,
+      "sexo": "macho",
+      "estado": "saludable",
+      "notas": "Necesita terrario grande"
+    },
+    {
+      "id": "a8901234-5678-9012-2345-890abcdef012",
+      "nombre": "Azul",
+      "especieId": "c8901234-5678-9012-2345-890abcdef008",
+      "fechaNacimiento": "2022-11-18T13:45:00Z",
+      "pesoActual": 650.0,
+      "longitudActual": 52.0,
+      "sexo": "macho",
+      "estado": "saludable",
+      "notas": "Muy curioso, lengua azul característica"
+    },
+    {
+      "id": "a9012345-6789-0123-3456-90abcdef0123",
+      "nombre": "Karma",
+      "especieId": "d9012345-6789-0123-3456-90abcdef0009",
+      "fechaNacimiento": "2024-02-14T10:15:00Z",
+      "pesoActual": 95.0,
+      "longitudActual": 35.0,
+      "sexo": "hembra",
+      "estado": "saludable",
+      "notas": "Colores espectaculares"
+    },
+    {
+      "id": "a0123456-7890-1234-4567-0abcdef01234",
+      "nombre": "Zeus",
+      "especieId": "e0123456-7890-1234-4567-0abcdef00010",
+      "fechaNacimiento": "2020-04-22T14:00:00Z",
+      "pesoActual": 8500.0,
+      "longitudActual": 220.0,
+      "sexo": "macho",
+      "estado": "saludable",
+      "notas": "Ejemplar grande y tranquilo"
+    }
+  ]
+}

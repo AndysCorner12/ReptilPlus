@@ -1,0 +1,94 @@
+{
+  "especies": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-1234567890a1",
+      "nombreComun": "Gecko Leopardo",
+      "nombreCientifico": "Eublepharis macularius",
+      "descripcion": "Gecko terrestre nocturno ideal para principiantes. Son robustos, dóciles y fáciles de cuidar.",
+      "familia": "Eublepharidae",
+      "tamanoPromedio": 25.0,
+      "esperanzaVida": 15
+    },
+    {
+      "id": "b2c3d4e5-f678-9012-bcde-234567890ab2",
+      "nombreComun": "Dragón Barbudo",
+      "nombreCientifico": "Pogona vitticeps",
+      "descripcion": "Lagarto diurno omnívoro muy sociable. Originario de Australia, es una de las especies más populares.",
+      "familia": "Agamidae",
+      "tamanoPromedio": 50.0,
+      "esperanzaVida": 12
+    },
+    {
+      "id": "c3d4e5f6-7890-1234-cdef-34567890abc3",
+      "nombreComun": "Pitón Bola",
+      "nombreCientifico": "Python regius",
+      "descripcion": "Serpiente constrictora dócil y popular. Se llama así porque se enrolla en forma de bola cuando se estresa.",
+      "familia": "Pythonidae",
+      "tamanoPromedio": 120.0,
+      "esperanzaVida": 30
+    },
+    {
+      "id": "d4e5f678-9012-3456-def0-4567890abcd4",
+      "nombreComun": "Gecko Crestado",
+      "nombreCientifico": "Correlophus ciliatus",
+      "descripcion": "Gecko arborícola con cresta característica. Considerado extinto hasta 1994, es muy popular en terrariofilia.",
+      "familia": "Diplodactylidae",
+      "tamanoPromedio": 20.0,
+      "esperanzaVida": 18
+    },
+    {
+      "id": "e5f67890-1234-5678-ef01-567890abcde5",
+      "nombreComun": "Camaleón Velado",
+      "nombreCientifico": "Chamaeleo calyptratus",
+      "descripcion": "Camaleón robusto con cresta craneal prominente. Requiere cuidados específicos de humedad y temperatura.",
+      "familia": "Chamaeleonidae",
+      "tamanoPromedio": 45.0,
+      "esperanzaVida": 8
+    },
+    {
+      "id": "a6789012-3456-7890-0123-67890abcdef6",
+      "nombreComun": "Serpiente del Maíz",
+      "nombreCientifico": "Pantherophis guttatus",
+      "descripcion": "Serpiente constrictora ideal para principiantes. Muy manejable y disponible en muchas morfologías.",
+      "familia": "Colubridae",
+      "tamanoPromedio": 150.0,
+      "esperanzaVida": 20
+    },
+    {
+      "id": "b7890123-4567-8901-1234-7890abcdef07",
+      "nombreComun": "Iguana Verde",
+      "nombreCientifico": "Iguana iguana",
+      "descripcion": "Lagarto herbívoro de gran tamaño. Requiere espacio considerable y dieta a base de vegetales.",
+      "familia": "Iguanidae",
+      "tamanoPromedio": 180.0,
+      "esperanzaVida": 20
+    },
+    {
+      "id": "c8901234-5678-9012-2345-890abcdef008",
+      "nombreComun": "Eslizón de Lengua Azul",
+      "nombreCientifico": "Tiliqua scincoides",
+      "descripcion": "Lagarto robusto omnívoro con lengua azul característica. Muy dócil y fácil de manejar.",
+      "familia": "Scincidae",
+      "tamanoPromedio": 50.0,
+      "esperanzaVida": 20
+    },
+    {
+      "id": "d9012345-6789-0123-3456-90abcdef0009",
+      "nombreComun": "Camaleón Pantera",
+      "nombreCientifico": "Furcifer pardalis",
+      "descripcion": "Camaleón colorido de cuidados intermedios. Los machos presentan colores espectaculares.",
+      "familia": "Chamaeleonidae",
+      "tamanoPromedio": 48.0,
+      "esperanzaVida": 7
+    },
+    {
+      "id": "e0123456-7890-1234-4567-0abcdef00010",
+      "nombreComun": "Boa Constrictor",
+      "nombreCientifico": "Boa constrictor",
+      "descripcion": "Serpiente constrictora de tamaño medio-grande. Muy apreciada por su temperamento tranquilo.",
+      "familia": "Boidae",
+      "tamanoPromedio": 250.0,
+      "esperanzaVida": 25
+    }
+  ]
+}
