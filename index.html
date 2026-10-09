@@ -232,6 +232,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:20px;letter-spacing:.0
 .gen{display:grid;gap:6px;margin:0 0 12px}
 .gen div{display:grid;gap:2px;padding:9px 12px;border-radius:10px;background:var(--bg);font-size:14px}
 .gen div span{color:var(--muted);font-size:12.5px;font-weight:600}
+.gen div.warn{box-shadow:inset 3px 0 0 #d08a1a}
 .gen div b{font-variant-numeric:tabular-nums;font-weight:600;overflow-wrap:anywhere}
 .search{width:100%;height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font:inherit;font-size:16px;margin-bottom:10px}
 .prow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;border-radius:12px;border:0;background:var(--bg)}
@@ -257,6 +258,13 @@ h1{font-family:var(--f-display);font-weight:400;font-size:20px;letter-spacing:.0
 .tbtns button{flex:1;height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);font-weight:700;font-size:15px}
 .tbtns .go{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .tskip{background:none;border:0;color:var(--muted);font-size:13.5px;font-weight:600;justify-self:center;padding:4px 10px}
+.node.plan{border-style:dashed;border-width:2.5px;background:var(--bg)}
+.node.plan.u{border-color:var(--muted)}
+.gph{background:transparent!important;color:var(--muted)!important;font-size:0}
+.gph>svg{width:46px;height:46px;opacity:.7}
+.ln.fam,.fam{fill:none;stroke:var(--muted);stroke-width:2.2;stroke-dasharray:3 6;stroke-linecap:round}
+.gbig{width:52px;height:52px;border-radius:14px;border:2.5px dashed var(--muted);display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 auto}
+.gbig svg{width:28px;height:28px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:430px){h1{font-size:18px}.pill{padding:0 8px;height:32px;min-width:32px}}
 </style>
@@ -326,7 +334,7 @@ const STORE=(()=>{
     const geckos=d.geckos.filter(g=>g&&ID.test(g.id)&&typeof g.name==='string'&&g.name.trim()).map(g=>({...g,name:str(g.name,40),sex:['M','F','U'].includes(g.sex)?g.sex:'U',morph:str(g.morph,80),notes:str(g.notes,800),
       photo:typeof g.photo==='string'&&PH.test(g.photo)?g.photo:'',weights:Array.isArray(g.weights)?g.weights.filter(w=>w&&DT.test(w.d)&&Number.isFinite(+w.g)).map(w=>({d:w.d,g:+w.g})):[]}));
     const boards=d.boards.filter(b=>b&&ID.test(b.id)).map(b=>({id:b.id,name:str(b.name,40)||'Board',created:+b.created||Date.now(),updated:+b.updated||Date.now(),
-      nodes:(Array.isArray(b.nodes)?b.nodes:[]).filter(n=>n&&ID.test(n.id)&&ID.test(n.g)).map(n=>({id:n.id,g:n.g,x:+n.x||0,y:+n.y||0})),
+      nodes:(Array.isArray(b.nodes)?b.nodes:[]).filter(n=>n&&ID.test(n.id)&&ID.test(n.g)).map(n=>({id:n.id,g:n.g,x:+n.x||0,y:+n.y||0,...(typeof n.from==='string'&&ID.test(n.from)?{from:n.from}:{})})),
       links:(Array.isArray(b.links)?b.links:[]).filter(l=>l&&ID.test(l.id)&&ID.test(l.m)&&ID.test(l.f)).map(l=>({...l,k:l.k==='opt'?'opt':'pair',notes:str(l.notes,500),clutches:Array.isArray(l.clutches)?l.clutches.filter(c=>c&&ID.test(c.id)&&DT.test(c.d)):[]}))}));
     return {geckos,boards}; }
   const bare=(id,b)=>({id,name:b.name||'My board',created:b.created||Date.now(),updated:b.updated||Date.now(),nodes:b.nodes||[],links:b.links||[]});
@@ -401,7 +409,7 @@ function ageText(b){ const m=monthsOld(b); if(m===null) return 'Age not set'; if
 function stage(g){ const m=monthsOld(g.birth); if(m===null) return g.grupo&&/cr[ií]a|hatchl|juv/i.test(g.grupo)?'cria':'adult'; return m<12?'cria':m<MIN_M?'juv':'adult'; }
 const STAGE={cria:'Juvenile',juv:'Sub-adult',adult:'Adult'};
 const isVisita=g=>g.status==='visita';
-const isActive=g=>!(g.status==='vendido'||g.status==='fallecido'||(isVisita(g)&&g.hasta&&g.hasta<today()));
+const isActive=g=>!g.planned&&!(g.status==='vendido'||g.status==='fallecido'||(isVisita(g)&&g.hasta&&g.hasta<today()));
 const CATS=['RTB','RTB PROVEN','PET','JUVENILE','HOLDBACK','FOR SALE'];
 const CATSHORT={'RTB':'RTB','RTB PROVEN':'PROVEN','PET':'PET','JUVENILE':'JUVENILE','HOLDBACK':'HOLDBACK','FOR SALE':'FOR SALE'};
 const STATUS={propio:'Owned',visita:'On loan',reservado:'Reserved',vendido:'Sold',fallecido:'Deceased'};
@@ -422,9 +430,10 @@ const GENES=[
   {k:'ss',name:'Soft Scale',type:'rec',re:/soft\s*scale/i},
   {k:'sw',name:'Superstripe (Super Soft Scale)',type:'rec',re:/super\s*stripe/i},
 ];
-function geneState(g,gene){ const m=g.morph||''; const src='(?:'+gene.re.source+')'; const het=new RegExp('(het|poss|66|50|100)[^,;/]*'+src,'i').test(m)||new RegExp(src+'[^,;/]*\\bhet\\b','i').test(m);
+function geneState(g,gene){ const m=g.morph||''; const src='(?:'+gene.re.source+')'; const het=new RegExp('\\b(het|poss|pos|66|50|100)\\b[^,;/]*?'+src,'i').test(m);
   if(gene.re.test(m)&&!het) return 'vis'; if(het) return 'het'; return 'no'; }
-function predict(a,b){ const out=[]; let lethal=false;
+function predict(a,b){ const r=predict0(a,b); r.out=r.out.map(x=>{ if(x.gene.type==='id'&&!x.bad){ const sa=geneState(a,x.gene), sb=geneState(b,x.gene); if(sa!=='no'&&sb!=='no'&&(a.planned||b.planned||sa==='het'||sb==='het')) return {...x,txt:PL.possLethal(x.gene.name),warn:true}; if((sa==='het'&&sb==='no')||(sa==='no'&&sb==='het')) return {...x,txt:PL.possOne(x.gene.name)}; } return x; }); return r; }
+function predict0(a,b){ const out=[]; let lethal=false;
   GENES.forEach(gene=>{ const sa=geneState(a,gene), sb=geneState(b,gene); if(sa==='no'&&sb==='no') return;
     if(gene.type==='id'){ if(sa==='vis'&&sb==='vis'){ lethal=true; out.push({gene,txt:'25% super (lethal), 50% '+gene.name+', 25% no gene',bad:true}); }
       else out.push({gene,txt:'50% '+gene.name+', 50% no gene'}); }
@@ -435,12 +444,15 @@ function predict(a,b){ const out=[]; let lethal=false;
       else if(het(sa)&&het(sb)) out.push({gene,txt:'25% visual, 50% het, 25% no gene'});
       else out.push({gene,txt:'50% het '+gene.name+' (if the other is not a carrier)'}); } });
   return {out,lethal}; }
-function related(a,b){ if(!a||!b) return null; const pa=[a.padre,a.madre].filter(Boolean), pb=[b.padre,b.madre].filter(Boolean);
+function related(a,b){ const r0=related0(a,b); if(r0||!a||!b) return r0;
+  const gp=x=>[x.padre,x.madre].filter(Boolean).flatMap(id=>{ const p=geckos[id]; return p?[p.padre,p.madre].filter(Boolean):[]; });
+  const ga=gp(a), gb=gp(b); if(ga.includes(b.id)||gb.includes(a.id)) return PL.grandkid; if(ga.some(x=>gb.includes(x))) return PL.cousins; return null; }
+function related0(a,b){ if(!a||!b) return null; const pa=[a.padre,a.madre].filter(Boolean), pb=[b.padre,b.madre].filter(Boolean);
   if(pa.includes(b.id)||pb.includes(a.id)) return 'parent and offspring';
   const shared=pa.filter(x=>pb.includes(x)); if(shared.length) return shared.length===2?'siblings':'half-siblings'; return null; }
 
 /* ---------- warnings ---------- */
-function geckoIssues(g){ const out=[]; if(!g) return out; const wi=wInfo(g); const m=monthsOld(g.birth);
+function geckoIssues(g){ const out=[]; if(!g||g.planned) return out; const wi=wInfo(g); const m=monthsOld(g.birth);
   if(g.sex==='F'){ if(wi&&wi.g>0&&wi.g<MIN_W_F) out.push(`${g.name} weighs ${fmtG(wi.g)} g. It is usual to wait until she is over ${MIN_W_F} g.`);
     if(m!==null&&m<MIN_M) out.push(`${g.name} is ${ageText(g.birth).toLowerCase()} old. Better to wait until ${MIN_M} months.`); }
   if(g.sex==='M'){ if(wi&&wi.g>0&&wi.g<MIN_W_M) out.push(`${g.name} weighs ${fmtG(wi.g)} g, light for a breeding male (guide: ${MIN_W_M} g).`);
@@ -479,12 +491,14 @@ function centerWorld(){ const r=vp.getBoundingClientRect(); return toWorld(r.lef
 const okPhoto=p=>typeof p==='string'&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(p);
 function photoStyle(g){ return okPhoto(g.photo)?` style="background-image:url('${g.photo}')"`:''; }
 function initial(g){ return esc((g.name||'?').trim().charAt(0).toUpperCase()); }
-function nodeHTML(n){ const g=gOf(n); if(!g) return ''; const c=g.sex==='M'?'m':g.sex==='F'?'f':'u'; const iss=nodeIssue(n); const wi=wInfo(g);
+function nodeHTML(n){ const g0=gOf(n); if(g0&&g0.planned) return ghostHTML(n,g0); return nodeHTML0(n); }
+function nodeHTML0(n){ const g=gOf(n); if(!g) return ''; const c=g.sex==='M'?'m':g.sex==='F'?'f':'u'; const iss=nodeIssue(n); const wi=wInfo(g);
   return `<div class="node ${c}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px">
     <div class="ph${g.photo?' has':''}"${photoStyle(g)}>${initial(g)}<span class="sx">${sxLabel(g)}</span>${iss?`<span class="wb ${iss}">!</span>`:''}${isVisita(g)?'<span class="vis">ON LOAN</span>':g.cat?`<span class="vis cat">${esc(CATSHORT[g.cat]||g.cat)}</span>`:''}</div>
     <div class="meta"><b>${esc(g.name)}</b><span class="mo">${esc(g.morph||'Morph not set')}</span><span>${esc(ageShort(g.birth))}${wi?` <span class="wt">· ${fmtG(wi.g)} g</span>`:''}</span></div></div>`; }
 function center(n){ return {x:n.x+NW/2,y:n.y+NH/2}; }
-function drawLines(){ let h='';
+function drawLines(){ drawLines0(); svgL.insertAdjacentHTML('afterbegin',famLines()); }
+function drawLines0(){ let h='';
   board.links.forEach(l=>{ const a=nodeById(l.m), b=nodeById(l.f); if(!gOf(a)||!gOf(b)) return;
     const p=center(a), q=center(b), bad=linkBad(l)||!!linkRel(l), mx=(p.x+q.x)/2, my=(p.y+q.y)/2;
     const d=`M${p.x} ${p.y}L${q.x} ${q.y}`; const st=l.k==='pair'?(l.status||'planeada'):'';
@@ -499,7 +513,7 @@ function drawLines(){ let h='';
     h+=`<path class="hit" data-link="${l.id}" d="${d}"/>`; });
   svgL.innerHTML=h; }
 function trayList(){ const q=search.trim().toLowerCase();
-  return Object.values(geckos).filter(g=>{ if(q) return (g.name+' '+(g.morph||'')).toLowerCase().includes(q);
+  return Object.values(geckos).filter(g=>{ if(g.planned) return false; if(q) return (g.name+' '+(g.morph||'')).toLowerCase().includes(q);
     if(filter==='all') return isActive(g); if(filter==='visita') return isVisita(g); if(filter==='vendido') return g.status==='vendido'||g.status==='fallecido'; if(!isActive(g)) return false;
     if(filter.startsWith('c:')) return (g.cat||'')===filter.slice(2); return (g.sex||'U')===filter; })
     .sort((a,b)=>{ const ci=g=>{ const i=CATS.indexOf(g.cat||''); return i<0?9:i; }; const sa=ci(a), sb=ci(b); if(sa!==sb) return sa-sb; return (a.sex||'U').localeCompare(b.sex||'U')||a.name.localeCompare(b.name,'es'); }); }
@@ -583,8 +597,8 @@ let toastT=null; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.
 function femalePairLink(fGeckoId){ return board.links.find(l=>l.k==='pair' && gOf(nodeById(l.f))?.id===fGeckoId); }
 function tryLink(a,b){ const ga=gOf(a), gb=gOf(b);
   if(ga.id===gb.id){ toast('That is the same gecko.'); return false; }
-  const sexes=ga.sex+gb.sex; if(sexes!=='MF'&&sexes!=='FM'){ toast(ga.sex==='U'||gb.sex==='U'?'Set the sex on its profile to pair it.':'Always pair a male with a female.'); return false; }
-  const m=ga.sex==='M'?a:b, f=ga.sex==='M'?b:a, gf=gOf(f);
+  const [SA,SB]=roleSex(ga,gb); const sexes=SA+SB; if(sexes!=='MF'&&sexes!=='FM'){ toast(ga.sex==='U'||gb.sex==='U'?'Set the sex on its profile to pair it.':'Always pair a male with a female.'); return false; }
+  const m=SA==='M'?a:b, f=SA==='M'?b:a, gf=gOf(f);
   if(board.links.some(l=>l.m===m.id&&l.f===f.id)){ toast('They are already paired.'); return false; }
   const existing=femalePairLink(gf.id);
   board.links.push({id:uid('l'),m:m.id,f:f.id,k:existing?'opt':'pair',status:'planeada',desde:'',hasta:'',notes:'',clutches:[]});
@@ -594,6 +608,8 @@ function tryLink(a,b){ const ga=gOf(a), gb=gOf(b);
 function nudge(n,t){ const p=center(n), q=center(t); let dx=p.x-q.x, dy=p.y-q.y, len=Math.hypot(dx,dy);
   if(len<1){dx=1;dy=.35;len=Math.hypot(dx,dy);} if(len<190){ n.x+=dx/len*(190-len); n.y+=dy/len*(190-len); } }
 function removeNode(id){ board.nodes=board.nodes.filter(n=>n.id!==id); board.links=board.links.filter(l=>l.m!==id&&l.f!==id); }
+function babySpot(x,y){ const busyAt=(px,py)=>board.nodes.some(o=>Math.abs(o.x-px)<NW+12&&Math.abs(o.y-py)<NH+12);
+  for(let row=0;row<8;row++){ for(const k of [0,1,-1,2,-2,3,-3]){ const px=x+k*(NW+24), py=y+row*(NH+40); if(!busyAt(px,py)) return [px,py]; } } return freeSpot(x,y); }
 function freeSpot(x,y){ const busyAt=(px,py)=>board.nodes.some(o=>Math.abs(o.x-px)<NW+12&&Math.abs(o.y-py)<NH+12);
   if(!busyAt(x,y)) return [x,y]; for(let r=1;r<12;r++){ for(let a=0;a<8*r;a++){ const t=a/(8*r)*2*Math.PI, px=Math.round(x+Math.cos(t)*r*(NW+20)), py=Math.round(y+Math.sin(t)*r*(NH+20)); if(!busyAt(px,py)) return [px,py]; } } return [x,y]; }
 function addNode(gid,wx,wy,free){ snap(); let x=Math.round(wx-NW/2), y=Math.round(wy-NH/2); if(free) [x,y]=freeSpot(x,y); const n={id:uid('n'),g:gid,x,y}; board.nodes.push(n); touchBoard(); render(); return n; }
@@ -731,7 +747,7 @@ function spark(g){ const w=wSorted(g); if(w.length<2) return ''; const W=320,H=7
 function parentName(id){ const g=id&&geckos[id]; return g?g.name:(id||''); }
 
 function geckoDetails(g){ const wi=wInfo(g); const iss=geckoIssues(g);
-  const kids=Object.values(geckos).filter(x=>x.padre===g.id||x.madre===g.id).map(x=>x.name);
+  const kids=Object.values(geckos).filter(x=>(x.padre===g.id||x.madre===g.id)&&(!x.planned||ghostAlive(x))).map(x=>x.name+(x.planned?PL.plannedTag:''));
   return `<dl class="kv">
     <dt>Sex</dt><dd>${SXN[g.sex]||'Unsexed'}${g.sexSure===false&&g.sex!=='U'?' <span class="badge w">PROBABLE</span>':''}</dd>
     <dt>Morph</dt><dd>${esc(g.morph||'Not set')}</dd>
@@ -740,13 +756,13 @@ function geckoDetails(g){ const wi=wInfo(g); const iss=geckoIssues(g);
     ${wi?`<dt>Last weight</dt><dd>${fmtG(wi.g)} g on ${fmtD(wi.d)}${wi.delta!==null?` <span class="${wi.delta<0?'badge bad':wi.delta>0?'badge ok':'badge'}">${wi.delta>0?'+':''}${fmtG(wi.delta)} g</span>`:''}${wi.days>WEIGH_DAYS?` <span class="badge w">NOT WEIGHED IN ${wi.days} D</span>`:''}</dd>`:'<dt>Weight</dt><dd>No weigh-ins</dd>'}
     ${g.status&&g.status!=='propio'?`<dt>Status</dt><dd>${STATUS[g.status]||esc(g.status)}${isVisita(g)?` · ${esc(g.owner||'')}${g.desde?' from '+fmtD(g.desde):''}${g.hasta?' until '+fmtD(g.hasta):''}`:''}</dd>`:''}
     ${g.padre||g.madre?`<dt>Parents</dt><dd>${esc(parentName(g.padre)||'?')} × ${esc(parentName(g.madre)||'?')}</dd>`:''}
-    ${kids.length?`<dt>Offspring</dt><dd>${esc(kids.join(', '))}</dd>`:''}
+    ${grandRow(g)}${kids.length?`<dt>Offspring</dt><dd>${esc(kids.join(', '))}</dd>`:''}
     ${g.project?`<dt>Project</dt><dd>${esc(g.project)}</dd>`:''}
   </dl>
   ${g.notes?`<p class="notes">${esc(g.notes)}</p>`:''}
   ${iss.length?`<ul class="list" style="margin-bottom:12px">${iss.map(m=>`<li class="w"><i>!</i><span>${esc(m)}</span></li>`).join('')}</ul>`:''}`; }
 
-function openNodeSheet(nid){ const n=nodeById(nid), g=gOf(n); if(!g) return;
+function openNodeSheet(nid){ const n=nodeById(nid), g=gOf(n); if(!g) return; if(g.planned){ openGhostSheet(g.id,nid); return; }
   const links=board.links.filter(l=>l.m===nid||l.f===nid);
   const partners=links.map(l=>{ const o=gOf(nodeById(l.m===nid?l.f:l.m)); return o?`${esc(o.name)}${l.k==='opt'?' (option)':l.status==='juntos'?' (together)':''}`:''; }).filter(Boolean);
   openSheet(`<div class="sh">${avatar(g,64)}<div><h3>${esc(g.name)} ${sxLabel(g)}</h3><p>${esc(g.morph||'Morph not set')}</p>${partners.length?`<p>With: ${partners.join(', ')}</p>`:''}</div></div>
@@ -809,7 +825,7 @@ function openLinkSheet(lid){ const l=board.links.find(x=>x.id===lid); if(!l) ret
     ${rel?`<ul class="list" style="margin-bottom:12px"><li><i>!</i><span>${esc(m.name)} and ${esc(f.name)} are ${rel}. Avoid inbreeding.</span></li></ul>`:''}
     ${p.lethal?`<ul class="list" style="margin-bottom:12px"><li><i>!</i><span>Both carry ${p.out.filter(x=>x.bad).map(x=>x.gene.name).join(' and ')}. About 25% of the offspring would be super, which is not viable.</span></li></ul>`:''}
     <p class="secttl" style="margin-top:0">Possible outcomes</p>
-    ${p.out.length?`<div class="gen">${p.out.map(x=>`<div><span>${esc(x.gene.name)}</span><b>${esc(x.txt)}</b></div>`).join('')}</div>`:'<p class="hint" style="margin:0 0 12px">No simple-inheritance genes found in these morphs.</p>'}
+    ${p.out.length?`<div class="gen">${p.out.map(x=>`<div class="${x.warn?'warn':''}"><span>${esc(x.gene.name)}</span><b>${esc(x.txt)}</b></div>`).join('')}</div>`:'<p class="hint" style="margin:0 0 12px">No simple-inheritance genes found in these morphs.</p>'}
     <p class="hint" style="margin:0 0 12px">Harlequin, dalmatian, portholes, tiger, charcoal and base colour are polygenic, so there are no percentages. Hets written in the morph (“het axanthic”) are taken into account.</p>
     ${l.k==='pair'?`<p class="secttl">Status</p>
     <div class="seg" style="margin-bottom:10px"><input type="radio" name="lst" id="lst-planeada" value="planeada"${st==='planeada'?' checked':''}><label for="lst-planeada">Planned</label><input type="radio" name="lst" id="lst-juntos" value="juntos"${st==='juntos'?' checked':''}><label for="lst-juntos">Together</label><input type="radio" name="lst" id="lst-separados" value="separados"${st==='separados'?' checked':''}><label for="lst-separados">Separated</label></div>
@@ -820,6 +836,7 @@ function openLinkSheet(lid){ const l=board.links.find(x=>x.id===lid); if(!l) ret
     ${(()=>{ const t=clutchTotals(l.clutches||[]); return t.n?`<p class="hint" style="margin:0 0 8px">${t.p} clutch${t.p===1?'':'es'} · ${t.h} egg${t.h===1?'':'s'} · ${t.f} fertile · ${t.b} hatched</p>`:''; })()}
     ${cl.length?`<div class="acts" style="margin-bottom:12px">${cl.map(c=>clutchRow(c)).join('')}</div><p class="hint" style="margin:-6px 0 12px">Tap the egg to record fertile, hatched and hatch date.</p>`:''}
     <div class="acts"><button class="act primary" id="a-save">${IC.check}<span>Save</span></button>`:`<div class="acts"><button class="act primary" id="a-pick">${IC.check}<span>Choose ${esc(m.name)} for ${esc(f.name)}</span></button>`}
+      ${l.k==='pair'?`<button class="act" id="a-baby">${IC.egg}<span>${PL.addBaby}</span></button>`:''}
       <button class="act danger" id="a-unl">${IC.cut}<span>Remove this pairing</span></button>
     </div>
     ${l.k==='opt'&&cl.length?`<p class="secttl">Recorded clutches</p><div class="acts ro">${cl.map(c=>clutchRow(c)).join('')}</div>`:''}
@@ -834,6 +851,7 @@ function openLinkSheet(lid){ const l=board.links.find(x=>x.id===lid); if(!l) ret
       row.insertAdjacentHTML('beforeend',`<div class="cedit"><label class="fld"><span>Fertile</span><select data-k="fert">${opts(c.n,c.fert??(c.res==='mal'?0:c.n))}</select></label><label class="fld"><span>Hatched</span><select data-k="nac"><option value="">—</option>${opts(c.n,c.nac??-1)}</select></label><label class="fld"><span>Hatch date</span><input type="date" data-k="dn" value="${esc(c.dn||'')}"></label><button class="act primary sm" data-csave>Save</button></div>`);
       row.querySelector('[data-csave]').onclick=()=>{ snap(); read(); c.fert=+row.querySelector('[data-k=fert]').value; const nv=row.querySelector('[data-k=nac]').value; c.nac=nv===''?null:+nv; c.dn=row.querySelector('[data-k=dn]').value||''; if(c.dn&&c.nac===null) c.nac=c.fert; c.res=clutchRes(c); touchBoard(); render(); openLinkSheet(lid); }; });
     sheet.querySelectorAll('[data-cdel]').forEach(b=>b.onclick=()=>{ snap(); read(); l.clutches=l.clutches.filter(x=>x.id!==b.dataset.cdel); touchBoard(); render(); openLinkSheet(lid); }); }
+  { const ab=$('#a-baby'); if(ab) ab.onclick=()=>addPlannedBaby(lid); }
   $('#a-unl').onclick=()=>{ snap(); board.links=board.links.filter(x=>x.id!==lid); touchBoard(); render(); closeSheet(); };
 }
 
@@ -847,9 +865,9 @@ function processImage(file){ return new Promise((res,rej)=>{ const url=URL.creat
       x.drawImage(im,(w-s)/2,(h-s)/2,s,s,0,0,S,S); URL.revokeObjectURL(url); let d=c.toDataURL('image/jpeg',.82); if(d.length>180000) d=c.toDataURL('image/jpeg',.65); res(d); }
     catch(e){ URL.revokeObjectURL(url); rej(e); } };
   im.src=url; }); }
-function parentOptions(sel,sex,self){ const keep=sel&&!(geckos[sel]&&(geckos[sel].sex===sex||geckos[sel].sex==='U')&&sel!==self); return '<option value="">—</option>'+(keep?`<option value="${esc(sel)}" selected>${esc(geckos[sel]?geckos[sel].name:sel)}</option>`:'')+Object.values(geckos).filter(g=>g.id!==self&&(g.sex===sex||g.sex==='U')).sort((a,b)=>a.name.localeCompare(b.name,'es')).map(g=>`<option value="${g.id}"${sel===g.id?' selected':''}>${esc(g.name)}</option>`).join(''); }
+function parentOptions(sel,sex,self){ const keep=sel&&!(geckos[sel]&&(geckos[sel].sex===sex||geckos[sel].sex==='U')&&sel!==self); return '<option value="">—</option>'+(keep?`<option value="${esc(sel)}" selected>${esc(geckos[sel]?geckos[sel].name:sel)}</option>`:'')+Object.values(geckos).filter(g=>g.id!==self&&!g.planned&&(g.sex===sex||g.sex==='U')).sort((a,b)=>a.name.localeCompare(b.name,'es')).map(g=>`<option value="${g.id}"${sel===g.id?' selected':''}>${esc(g.name)}</option>`).join(''); }
 
-function openGeckoForm(id){ const g=id?geckos[id]:null; let photo=g&&okPhoto(g.photo)?g.photo:''; const sex=g?g.sex||'U':'U'; const status=g?g.status||'propio':'propio';
+function openGeckoForm(id){ const g=id?geckos[id]:null; if(g&&g.planned){ openGhostSheet(g.id); return; } let photo=g&&okPhoto(g.photo)?g.photo:''; const sex=g?g.sex||'U':'U'; const status=g?g.status||'propio':'propio';
   const onBoard=g&&board.nodes.some(n=>n.g===g.id);
   openSheet(`${g?`<div class="sh">${avatar(g,52)}<div><h3>${esc(g.name)} ${sxLabel(g)}</h3><p>${esc(g.morph||'')}</p></div></div>
     <div class="acts" style="margin-bottom:14px"><button class="act primary" id="f-place">${IC.board}<span>${onBoard?'Put another copy on the board':'Put on the board'}</span></button><button class="act" id="f-weigh">${IC.scale}<span>Weigh-ins${(()=>{ const wi=wInfo(g); return wi?` · ${fmtG(wi.g)} g ${wi.days} d ago`:''; })()}</span></button></div>`:''}
@@ -913,9 +931,64 @@ function openGeckoForm(id){ const g=id?geckos[id]:null; let photo=g&&okPhoto(g.p
 }
 
 /* ---------- export ---------- */
+const PL={addBaby:'Add planned baby',badge:'PLANNED',notHatched:'Not hatched yet',noMorph:'Genetics to be decided',plannedTag:' (planned)',grand:'Grandparents',
+  babyName:(m,f)=>`${m} × ${f} baby`,added:n=>`${n} added under the pair.`,plannedSub:'Planned baby',fromParents:'What it can inherit from its parents',
+  name:'Name',sex:'Sex',male:'♂ Male',female:'♀ Female',either:'Either',morph:'Expected genetics',morphHint:'Filled in from the parents. “poss” = possible. Change it to match the baby you plan to keep.',
+  notes:'Notes',save:'Save',saved:'Planned baby saved.',hatched:'It hatched! Move it to the collection',hatchedToast:n=>`${n} is now in your collection. Finish its profile.`,
+  removeBaby:'Delete this planned baby',removed:'Planned baby deleted.',group:y=>`Hatchlings ${y}`,juvCat:'JUVENILE',either2:'♂/♀',
+  possOne:n=>`Only if the baby turns out ${n}: 50% ${n}, 50% no gene.`,possLethal:n=>`If both turn out ${n}: 25% super (lethal). Check before pairing them.`,cousins:'cousins (shared grandparents)',grandkid:'grandparent and grandchild',
+  csvTitle:'PLANNED BABIES',csvHead:['Name','Sire','Dam','Sex','Expected genetics','Board'],sexCsv:{M:'♂',F:'♀',U:'either'},
+  helpBaby:'Tap a pair’s line → “Add planned baby” to create a baby that has not hatched yet. It appears under its parents with a family line. Pair planned babies from different pairs to plan your second generation; the app warns you if they are related. When it hatches, tap it → “It hatched!”.',
+  legendFam:'Family line (parents → baby)',noBoard:'—'};
+function ghostAlive(g){ return Object.values(boards).some(b=>b.nodes.some(n=>n.g===g.id)); }
+function roleSex(ga,gb){ let A=ga.sex||'U', B=gb.sex||'U'; const ua=!!ga.planned&&A==='U', ub=!!gb.planned&&B==='U';
+  if(ua&&ub){ A='F'; B='M'; } else if(ua){ A=B==='M'?'F':B==='F'?'M':'U'; } else if(ub){ B=A==='M'?'F':A==='F'?'M':'U'; } return [A,B]; }
+function expectedMorph(a,b){ const t=[]; GENES.forEach(gene=>{ const sa=geneState(a,gene), sb=geneState(b,gene); if(sa==='no'&&sb==='no') return; const N=gene.name.replace(/ \(.*\)$/,'');
+    if(gene.type==='id') t.push('poss '+N);
+    else if(sa==='vis'&&sb==='vis') t.push(N);
+    else if(sa==='vis'||sb==='vis') t.push((sa==='het'||sb==='het')?'poss '+N+' / het':'het '+N);
+    else t.push('poss het '+N); });
+  return t.join(', '); }
+function grandRow(g){ const parts=[g.padre,g.madre].map(pid=>{ const p=geckos[pid]; if(!p||!(p.padre||p.madre)) return ''; return `${esc(p.name)}: ${esc(parentName(p.padre)||'?')} × ${esc(parentName(p.madre)||'?')}`; }).filter(Boolean);
+  return parts.length?`<dt>${PL.grand}</dt><dd>${parts.join('<br>')}</dd>`:''; }
+function ghostHTML(n,g){ const c=g.sex==='M'?'m':g.sex==='F'?'f':'u'; const iss=nodeIssue(n);
+  return `<div class="node plan ${c}" data-id="${esc(n.id)}" style="left:${n.x}px;top:${n.y}px"><div class="ph gph">${IC.egg}<span class="sx">${g.sex==='U'?PL.either2:SX[g.sex]}</span>${iss?`<span class="wb ${iss}">!</span>`:''}<span class="vis cat">${PL.badge}</span></div>
+    <div class="meta"><b>${esc(g.name)}</b><span class="mo">${esc(g.morph||PL.noMorph)}</span><span>${PL.notHatched}</span></div></div>`; }
+function famLines(){ let h=''; board.nodes.forEach(n=>{ const g=gOf(n); if(!g||!g.padre||!g.madre) return; let L=n.from&&board.links.find(x=>x.id===n.from);
+    if(!L) L=board.links.find(x=>x.k==='pair'&&gOf(nodeById(x.m))?.id===g.padre&&gOf(nodeById(x.f))?.id===g.madre);
+    if(!L) return; const a=nodeById(L.m), b=nodeById(L.f); if(!gOf(a)||!gOf(b)) return; const p=center(a), q=center(b), mx=(p.x+q.x)/2, my=(p.y+q.y)/2, tx=n.x+NW/2, ty=n.y;
+    const midY=ty>my?Math.max(my+28,(my+ty)/2):(my+ty)/2; h+=`<path class="fam" d="M${mx} ${my}V${midY}H${tx}V${ty}"/>`; }); return h; }
+function addPlannedBaby(lid){ const l=board.links.find(x=>x.id===lid); if(!l) return; const a=nodeById(l.m), b=nodeById(l.f), m=gOf(a), f=gOf(b); if(!m||!f) return;
+  const sibs=board.nodes.filter(n=>n.from===lid).length; const id=uid('g');
+  const baby={id,planned:true,name:PL.babyName(m.name,f.name)+(sibs?' '+(sibs+1):''),sex:'U',sexSure:true,morph:expectedMorph(m,f),birth:'',grupo:'',cat:'',padre:m.id,madre:f.id,project:m.project||f.project||'',status:'propio',owner:'',desde:'',hasta:'',notes:'',photo:'',weights:[],created:Date.now()};
+  geckos[id]=baby; const p=center(a), q=center(b);
+  snap(); const [fx,fy]=babySpot(Math.round((p.x+q.x)/2-NW/2),Math.round(Math.max(p.y,q.y)+NH/2+80)); board.nodes.push({id:uid('n'),g:id,x:fx,y:fy,from:lid}); touchBoard();
+  saveGecko(baby); closeSheet(); toast(PL.added(baby.name)); }
+function openGhostSheet(gid,nid){ const g=geckos[gid]; if(!g) return; const pa=geckos[g.padre], ma=geckos[g.madre]; const pr=pa&&ma?predict(pa,ma):{out:[]};
+  const kids=Object.values(geckos).filter(x=>(x.padre===g.id||x.madre===g.id)&&(!x.planned||ghostAlive(x)));
+  openSheet(`<div class="sh"><span class="gbig">${IC.egg}</span><div><h3>${esc(g.name)}</h3><p>${PL.plannedSub} · ${esc(parentName(g.padre)||'?')} × ${esc(parentName(g.madre)||'?')}</p></div></div>
+    <dl class="kv">${grandRow(g)}${kids.length?`<dt>↓</dt><dd>${esc(kids.map(x=>x.name).join(', '))}</dd>`:''}</dl>
+    ${pr.out.length?`<p class="secttl" style="margin-top:0">${PL.fromParents}</p><div class="gen">${pr.out.map(x=>`<div class="${x.warn?'warn':''}"><span>${esc(x.gene.name)}</span><b>${esc(x.txt)}</b></div>`).join('')}</div>`:''}
+    <form class="form" id="gh-form" novalidate>
+      <label class="fld"><span>${PL.name}</span><input type="text" id="gh-name" maxlength="40" value="${esc(g.name)}"></label>
+      <div class="fld"><span>${PL.sex}</span><div class="seg"><input type="radio" name="ghsx" id="ghsx-M" value="M"${g.sex==='M'?' checked':''}><label for="ghsx-M">${PL.male}</label><input type="radio" name="ghsx" id="ghsx-F" value="F"${g.sex==='F'?' checked':''}><label for="ghsx-F">${PL.female}</label><input type="radio" name="ghsx" id="ghsx-U" value="U"${g.sex!=='M'&&g.sex!=='F'?' checked':''}><label for="ghsx-U">${PL.either}</label></div></div>
+      <label class="fld"><span>${PL.morph}</span><input type="text" id="gh-morph" list="morphs" maxlength="80" value="${esc(g.morph||'')}"></label>
+      <p class="hint" style="margin:-6px 0 0">${PL.morphHint}</p>
+      <label class="fld"><span>${PL.notes}</span><textarea id="gh-notes" maxlength="500">${esc(g.notes||'')}</textarea></label>
+      <div class="acts"><button class="act primary" type="submit" style="justify-content:center">${PL.save}</button></div>
+    </form>
+    <div class="acts" style="margin-top:8px"><button class="act" id="gh-hatch">${IC.egg}<span>${PL.hatched}</span></button><button class="act danger" id="gh-del">${IC.trash}<span>${PL.removeBaby}</span></button></div>`);
+  $('#gh-form').onsubmit=e=>{ e.preventDefault(); const name=$('#gh-name').value.trim()||g.name; const sx=(document.querySelector('input[name=ghsx]:checked')||{}).value||'U';
+    const ng={...g,name,sex:sx,morph:$('#gh-morph').value.trim(),notes:$('#gh-notes').value.trim()};
+    if(sx!=='U'){ Object.entries(boards).forEach(([bid,b])=>{ const ids=new Set(b.nodes.filter(n=>n.g===g.id).map(n=>n.id)); const before=b.links.length;
+      b.links=b.links.filter(l=>!((ids.has(l.m)&&sx==='F')||(ids.has(l.f)&&sx==='M'))); if(b.links.length!==before){ undoStack=[]; if(bid===cur) touchBoard(); else putB(bid,b).catch(saveErr); } }); }
+    saveGecko(ng); closeSheet(); toast(PL.saved); };
+  $('#gh-hatch').onclick=()=>{ const y=new Date().getFullYear(); const ng={...g,planned:false,birth:today(),grupo:PL.group(y),cat:PL.juvCat,sexSure:g.sex==='U'?true:false}; saveGecko(ng); toast(PL.hatchedToast(ng.name)); openGeckoForm(ng.id); };
+  armDanger($('#gh-del'),PL.removeBaby+' ✓',()=>{ deleteGecko(g.id); closeSheet(); toast(PL.removed); }); }
+
 function csvEsc(v){ v=String(v??''); return /[",;\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
 function exportCSV(){ const rows=[['Name','Sex','Sex confirmed','Morph','Hatch date','Age','Group','Category','Status','Owner (loan)','From','Until','Sire','Dam','Project','Last weight (g)','Last weigh-in date','Previous weight (g)','Change (g)','Days since weigh-in','Notes']];
-  Object.values(geckos).sort((a,b)=>a.name.localeCompare(b.name,'es')).forEach(g=>{ const wi=wInfo(g), p=prevW(g);
+  Object.values(geckos).sort((a,b)=>a.name.localeCompare(b.name,'es')).forEach(g=>{ if(g.planned) return; const wi=wInfo(g), p=prevW(g);
     rows.push([g.name,SX[g.sex]||'?',g.sex==='U'?'':(g.sexSure===false?'no':'yes'),g.morph||'',g.birth?fmtD(g.birth):'',g.birth?ageText(g.birth):'',g.grupo||'',g.cat||'',STATUS[g.status]||'Owned',g.owner||'',fmtD(g.desde),fmtD(g.hasta),parentName(g.padre),parentName(g.madre),g.project||'',wi?fmtG(wi.g):'',wi?fmtD(wi.d):'',p?fmtG(p.g):'',wi&&wi.delta!==null?fmtG(wi.delta):'',wi?wi.days:'',g.notes||'']); });
   rows.push([]); rows.push(['WEIGH-INS']); rows.push(['Name','Date','Weight (g)']);
   Object.values(geckos).sort((a,b)=>a.name.localeCompare(b.name,'es')).forEach(g=>wSorted(g).forEach(w=>rows.push([g.name,fmtD(w.d),fmtG(w.g)])));
@@ -926,6 +999,8 @@ function exportCSV(){ const rows=[['Name','Sex','Sex confirmed','Morph','Hatch d
   rows.push([]); rows.push(['CLUTCHES']); rows.push(['Board','Male','Female','Lay date','Eggs','Fertile','Hatched','Hatch date','Incubation days','Result']);
   Object.values(boards).forEach(b=>b.links.forEach(l=>{ const m=geckos[(b.nodes.find(n=>n.id===l.m)||{}).g], f=geckos[(b.nodes.find(n=>n.id===l.f)||{}).g]; if(!m||!f) return;
     (l.clutches||[]).slice().sort((a,b)=>a.d<b.d?-1:1).forEach(c=>{ const res=c.res||clutchRes(c); rows.push([b.name,m.name,f.name,fmtD(c.d),c.n,c.fert??'',c.nac??'',fmtD(c.dn),c.dn&&c.d?Math.round((new Date(c.dn)-new Date(c.d))/864e5):'',res==='nac'?'hatched':res==='mal'?'not viable':'incubating']); }); }));
+  { const pl=Object.values(geckos).filter(g=>g.planned&&ghostAlive(g)); if(pl.length){ rows.push([]); rows.push([PL.csvTitle]); rows.push(PL.csvHead);
+    pl.forEach(g=>rows.push([g.name,parentName(g.padre),parentName(g.madre),PL.sexCsv[g.sex]||PL.sexCsv.U,g.morph||'',Object.values(boards).filter(b=>b.nodes.some(n=>n.g===g.id)).map(b=>b.name).join(' / ')||PL.noBoard])); } }
   return '﻿'+rows.map(r=>r.map(csvEsc).join(',')).join('\r\n'); }
 
 /* ---------- boards & help ---------- */
@@ -965,8 +1040,10 @@ $('#helpBtn').onclick=()=>{ openSheet(`<div class="sh"><div><h3>How it works</h3
     <li class="n"><i>6</i><span>The scale at the top is the weekly weigh-in: enter all of the weights for today in one list. The number shows how many have gone more than ${WEIGH_DAYS} days without a weigh-in.</span></li>
     <li class="n"><i>7</i><span>Pinch to zoom, drag the background to move around and use the arrow to undo.</span></li>
     <li class="n"><i>8</i><span>Tap the board name to switch season, duplicate the board or export everything to Excel.</span></li>
+  <li class="n"><i>9</i><span>${PL.helpBaby}</span></li>
   </ul>
   <div class="legend">
+    <div><svg width="44" height="10"><line x1="2" y1="5" x2="42" y2="5" stroke="var(--muted)" stroke-width="2.2" stroke-dasharray="3 6" stroke-linecap="round"/></svg>${PL.legendFam}</div>
     <div><svg width="44" height="10"><line x1="2" y1="5" x2="42" y2="5" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/></svg>Planned pair</div>
     <div><svg width="44" height="10"><line x1="2" y1="5" x2="42" y2="5" stroke="var(--ok)" stroke-width="3.5" stroke-linecap="round"/></svg>Together now</div>
     <div><svg width="44" height="10"><line x1="2" y1="5" x2="42" y2="5" stroke="var(--muted)" stroke-width="3" stroke-linecap="round"/></svg>Separated (season done)</div>
