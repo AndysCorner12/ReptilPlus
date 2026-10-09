@@ -577,7 +577,9 @@ function tryLink(a,b){ const ga=gOf(a), gb=gOf(b);
 function nudge(n,t){ const p=center(n), q=center(t); let dx=p.x-q.x, dy=p.y-q.y, len=Math.hypot(dx,dy);
   if(len<1){dx=1;dy=.35;len=Math.hypot(dx,dy);} if(len<190){ n.x+=dx/len*(190-len); n.y+=dy/len*(190-len); } }
 function removeNode(id){ board.nodes=board.nodes.filter(n=>n.id!==id); board.links=board.links.filter(l=>l.m!==id&&l.f!==id); }
-function addNode(gid,wx,wy){ snap(); const n={id:uid('n'),g:gid,x:Math.round(wx-NW/2),y:Math.round(wy-NH/2)}; board.nodes.push(n); touchBoard(); render(); return n; }
+function freeSpot(x,y){ const busyAt=(px,py)=>board.nodes.some(o=>Math.abs(o.x-px)<NW+12&&Math.abs(o.y-py)<NH+12);
+  if(!busyAt(x,y)) return [x,y]; for(let r=1;r<12;r++){ for(let a=0;a<8*r;a++){ const t=a/(8*r)*2*Math.PI, px=Math.round(x+Math.cos(t)*r*(NW+20)), py=Math.round(y+Math.sin(t)*r*(NH+20)); if(!busyAt(px,py)) return [px,py]; } } return [x,y]; }
+function addNode(gid,wx,wy,free){ snap(); let x=Math.round(wx-NW/2), y=Math.round(wy-NH/2); if(free) [x,y]=freeSpot(x,y); const n={id:uid('n'),g:gid,x,y}; board.nodes.push(n); touchBoard(); render(); return n; }
 
 /* ---------- board gestures ---------- */
 const pts=new Map(); let mode=null, drag=null, pan=null, pinch=null, ltap=null;
@@ -868,7 +870,7 @@ function openGeckoForm(id){ const g=id?geckos[id]:null; let photo=g&&okPhoto(g.p
       <div class="acts"><button class="act primary" type="submit" style="justify-content:center">${g?'Guardar cambios':'Añadir gecko'}</button>
       ${g?`<button class="act danger" type="button" id="f-del">${IC.trash}<span>Borrar ${esc(g.name)} de la colección</span></button>`:''}</div>
     </form>`);
-  if(g){ $('#f-place').onclick=()=>{ const c=centerWorld(); const off=board.nodes.length%4*24; addNode(g.id,c.x+off,c.y+off); closeSheet(); toast(`${g.name} está en el tablero.`); };
+  if(g){ $('#f-place').onclick=()=>{ const c=centerWorld(); addNode(g.id,c.x,c.y,true); closeSheet(); toast(`${g.name} está en el tablero.`); };
     $('#f-weigh').onclick=()=>openWeigh(g.id,()=>openGeckoForm(g.id)); }
   $('#f-pv').insertAdjacentHTML('beforeend','<input type="file" accept="image/*" class="pvin" aria-label="Elegir foto">');
   const onPhoto=async e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return; const m=$('#f-pmsg'); m.hidden=false; m.textContent='Preparando foto…';
@@ -890,7 +892,7 @@ function openGeckoForm(id){ const g=id?geckos[id]:null; let photo=g&&okPhoto(g.p
     if(g&&g.sex!==data.sex){ undoStack=[]; Object.entries(boards).forEach(([bid,b])=>{ const ids=new Set(b.nodes.filter(n=>n.g===g.id).map(n=>n.id)); const before=b.links.length;
       b.links=b.links.filter(l=>!ids.has(l.m)&&!ids.has(l.f)); if(before!==b.links.length){ if(bid===cur) touchBoard(); else putB(bid,b).catch(saveErr); } }); }
     saveGecko(data); closeSheet();
-    if(!g){ const c=centerWorld(); addNode(data.id,c.x,c.y); toast(`${name} añadido al tablero.`); } else toast('Ficha guardada.'); };
+    if(!g){ const c=centerWorld(); addNode(data.id,c.x,c.y,true); toast(`${name} añadido al tablero.`); } else toast('Ficha guardada.'); };
 }
 
 /* ---------- export ---------- */
