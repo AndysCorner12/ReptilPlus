@@ -502,11 +502,16 @@ function nodeHTML0(n){ const g=gOf(n); if(!g) return ''; const c=g.sex==='M'?'m'
     <div class="ph${g.photo?' has':''}"${photoStyle(g)}>${initial(g)}<span class="sx">${sxLabel(g)}</span>${iss?`<span class="wb ${iss}">!</span>`:''}${g.status==='externo'?`<span class="vis">${PL2.extBadge}</span>`:isVisita(g)?'<span class="vis">VISITA</span>':g.cat?`<span class="vis cat">${esc(CATSHORT[g.cat]||g.cat)}</span>`:''}</div>
     <div class="meta"><b>${esc(g.name)}</b><span class="mo">${esc(g.morph||'Morph sin indicar')}</span><span>${esc(ageShort(g.birth))}${wi?` <span class="wt">· ${fmtG(wi.g)} g</span>`:''}</span></div></div>`; }
 function center(n){ return {x:n.x+NW/2,y:n.y+NH/2}; }
+function linkGeom(a,b){ const p=center(a), q=center(b);
+  if(Math.abs(p.y-q.y)<20){ const lo=Math.min(p.x,q.x), hi=Math.max(p.x,q.x), y=(p.y+q.y)/2;
+    const k=board.nodes.filter(o=>o!==a&&o!==b&&o.x+NW/2>lo+4&&o.x+NW/2<hi-4&&o.y<=y&&o.y+NH>=y).length;
+    if(k){ const yb=Math.max(p.y,q.y)+NH/2+24+(k-1)*30; return {d:`M${p.x} ${p.y+NH/2}V${yb}H${q.x}V${q.y+NH/2}`,mx:(p.x+q.x)/2,my:yb}; } }
+  return {d:`M${p.x} ${p.y}L${q.x} ${q.y}`,mx:(p.x+q.x)/2,my:(p.y+q.y)/2}; }
 function drawLines(){ drawLines0(); svgL.insertAdjacentHTML('afterbegin',famLines()); }
 function drawLines0(){ let h='';
   board.links.forEach(l=>{ const a=nodeById(l.m), b=nodeById(l.f); if(!gOf(a)||!gOf(b)) return;
-    const p=center(a), q=center(b), bad=linkBad(l)||!!linkRel(l), mx=(p.x+q.x)/2, my=(p.y+q.y)/2;
-    const d=`M${p.x} ${p.y}L${q.x} ${q.y}`; const st=l.k==='pair'?(l.status||'planeada'):'';
+    const p=center(a), q=center(b), bad=linkBad(l)||!!linkRel(l), G=linkGeom(a,b), mx=G.mx, my=G.my;
+    const d=G.d; const st=l.k==='pair'?(l.status||'planeada'):'';
     h+=`<path class="ln ${l.k} ${st}${bad?' bad':''}" d="${d}"/>`;
     let label='', cls=''; const nC=(l.clutches||[]).length;
     if(bad){ label='! '+(linkRel(l)||'cruce letal'); cls='bad'; }
@@ -965,7 +970,7 @@ function ghostHTML(n,g){ const c=g.sex==='M'?'m':g.sex==='F'?'f':'u'; const iss=
     <div class="meta"><b>${esc(g.name)}</b><span class="mo">${esc(g.morph||PL.noMorph)}</span><span>${PL.notHatched}</span></div></div>`; }
 function famLines(){ let h=''; board.nodes.forEach(n=>{ const g=gOf(n); if(!g||!g.padre||!g.madre) return; let L=n.from&&board.links.find(x=>x.id===n.from);
     if(!L) L=board.links.find(x=>x.k==='pair'&&gOf(nodeById(x.m))?.id===g.padre&&gOf(nodeById(x.f))?.id===g.madre);
-    if(!L) return; const a=nodeById(L.m), b=nodeById(L.f); if(!gOf(a)||!gOf(b)) return; const p=center(a), q=center(b), mx=(p.x+q.x)/2, my=(p.y+q.y)/2, tx=n.x+NW/2, ty=n.y;
+    if(!L) return; const a=nodeById(L.m), b=nodeById(L.f); if(!gOf(a)||!gOf(b)) return; const G=linkGeom(a,b), mx=G.mx, my=G.my, tx=n.x+NW/2, ty=n.y;
     const midY=ty>my?Math.max(my+28,(my+ty)/2):(my+ty)/2; h+=`<path class="fam" d="M${mx} ${my}V${midY}H${tx}V${ty}"/>`; }); return h; }
 function addPlannedBaby(lid){ const l=board.links.find(x=>x.id===lid); if(!l) return; const a=nodeById(l.m), b=nodeById(l.f), m=gOf(a), f=gOf(b); if(!m||!f) return;
   const sibs=board.nodes.filter(n=>n.from===lid).length; const id=uid('g');
@@ -1043,23 +1048,36 @@ function openTree(gid){ const g=geckos[gid]; if(!g) return; const par=x=>{ const
     <div class="treewrap"><div class="treehead" style="grid-template-columns:repeat(${C},128px)">${PL2.cols.slice(0,C).map(t=>`<span>${t}</span>`).join('')}</div>${h}</div>
     <p class="secttl">${PL2.kids}</p>${kids.length?`<div class="kids">${kids.map(x=>treeCell(x.id)).join('')}</div>`:`<p class="hint">${PL2.noKids}</p>`}`); }
 function tidyBoard(){ const N=board.nodes.filter(n=>gOf(n)); if(!N.length) return; snap();
-  const byId=Object.fromEntries(N.map(n=>[n.id,n])); const pairs=board.links.filter(l=>l.k==='pair'&&byId[l.m]&&byId[l.f]); const opts=board.links.filter(l=>l.k==='opt'&&byId[l.m]&&byId[l.f]);
-  const groups=[], inG=new Set();
-  [...new Set(pairs.map(l=>l.m))].forEach(mid=>{ const fs=pairs.filter(l=>l.m===mid).map(l=>l.f).filter(f=>!inG.has(f)); groups.push({top:mid,bottom:fs}); inG.add(mid); fs.forEach(f=>inG.add(f)); });
-  opts.forEach(l=>[l.m,l.f].forEach(id=>{ if(!inG.has(id)){ groups.push({top:id,bottom:[]}); inG.add(id); } }));
-  N.forEach(n=>{ if(!inG.has(n.id)){ groups.push({top:n.id,bottom:[]}); inG.add(n.id); } });
+  const byId=Object.fromEntries(N.map(n=>[n.id,n])); const LK=board.links.filter(l=>byId[l.m]&&byId[l.f]);
+  const pairs=LK.filter(l=>l.k==='pair'), opts=LK.filter(l=>l.k==='opt'); const groups=[], grp={};
+  const newG=hub=>{ const G={hub,L:[],R:[]}; groups.push(G); grp[hub]=G; return G; };
+  const side=G=>G.L.length<=G.R.length?G.L:G.R; const put=(G,arr,id)=>{ arr.push(id); grp[id]=G; };
+  const hubs=[...new Set(pairs.map(l=>l.m))].sort((x,y)=>pairs.filter(l=>l.m===y).length-pairs.filter(l=>l.m===x).length);
+  hubs.forEach(mid=>{ if(grp[mid]) return; const G=newG(mid); pairs.filter(l=>l.m===mid).forEach(l=>{ if(!grp[l.f]) put(G,side(G),l.f); }); });
+  pairs.forEach(l=>{ if(!grp[l.f]) put(grp[l.m],side(grp[l.m]),l.f); });
+  opts.forEach(l=>{ const a=grp[l.m], b=grp[l.f]; if(a&&b) return;
+    if(!a&&!b){ const G=newG(l.m); put(G,side(G),l.f); }
+    else if(b){ put(b,b.L.includes(l.f)?b.L:b.R.includes(l.f)?b.R:side(b),l.m); }
+    else put(a,side(a),l.f); });
+  N.forEach(n=>{ if(!grp[n.id]) newG(n.id); });
   const nodeOfG={}; N.forEach(n=>{ (nodeOfG[n.g]=nodeOfG[n.g]||[]).push(n.id); });
-  const memo={}; const gen=(nid,d)=>{ if(memo[nid]!=null) return memo[nid]; if(d>8) return 0; const g=gOf(byId[nid]); let v=0; [g.padre,g.madre].forEach(pg=>(nodeOfG[pg]||[]).forEach(pn=>{ if(pn!==nid) v=Math.max(v,gen(pn,d+1)+1); })); memo[nid]=v; return v; };
-  groups.forEach(G=>{ G.gen=Math.max(...[G.top,...G.bottom].map(id=>gen(id,0))); G.w=Math.max(1,G.bottom.length); });
-  const rows={}; groups.forEach(G=>(rows[G.gen]=rows[G.gen]||[]).push(G));
-  const colW=NW+28, gapG=70, vGap=60, rowGap=120; const placedX={}; let y=0;
-  Object.keys(rows).map(Number).sort((a,b)=>a-b).forEach(r=>{ const list=rows[r];
-    list.forEach(G=>{ const xs=[]; [G.top,...G.bottom].forEach(id=>{ const g=gOf(byId[id]); [g.padre,g.madre].forEach(pg=>(nodeOfG[pg]||[]).forEach(pn=>{ if(placedX[pn]!=null) xs.push(placedX[pn]); })); }); G.key=xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:byId[G.top].x; });
-    list.sort((a,b)=>a.key-b.key); let x=0, two=false;
-    list.forEach(G=>{ const w=G.w*colW, cx=x+w/2, t=byId[G.top]; t.x=Math.round(cx-NW/2); t.y=y; placedX[t.id]=cx;
-      G.bottom.forEach((fid,i)=>{ const f=byId[fid], fx=x+i*colW+colW/2; f.x=Math.round(fx-NW/2); f.y=y+NH+vGap; placedX[fid]=fx; }); if(G.bottom.length) two=true; x+=w+gapG; });
-    const shift=Math.round(-(x-gapG)/2); list.forEach(G=>[G.top,...G.bottom].forEach(id=>{ byId[id].x+=shift; placedX[id]+=shift; }));
-    y+=(two?2*NH+vGap:NH)+rowGap; });
+  const parN=id=>{ const g=gOf(byId[id]); const o=[]; [g.padre,g.madre].forEach(pg=>(nodeOfG[pg]||[]).forEach(pn=>{ if(pn!==id) o.push(pn); })); return o; };
+  groups.forEach(G=>{ G.slots=[...G.L.slice().reverse(),G.hub,...G.R]; G.solo=G.slots.length===1&&!LK.some(l=>l.m===G.hub||l.f===G.hub);
+    G.pn=[...new Set(G.slots.flatMap(parN))]; G.pg=new Set(G.pn.map(pn=>grp[pn]).filter(x=>x&&x!==G)); });
+  const colW=NW+180, soloW=NW+36, gapG=110, placed=new Set(), X={}; let y=0;
+  const width=G=>G.solo?NW:G.slots.length*colW-(colW-NW);
+  const line=list=>{ if(!list.length) return; let cur=null, depth=0;
+    list.forEach(G=>{ const xs=G.pn.filter(pn=>X[pn]!=null).map(pn=>X[pn]); G.key=xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:null; });
+    list.sort((a,b)=>(a.key??-1e9)-(b.key??-1e9)||byId[a.hub].y-byId[b.hub].y||byId[a.hub].x-byId[b.hub].x);
+    list.forEach(G=>{ const w=width(G); let left=cur==null?0:cur+(G.solo&&list[0].solo?soloW-NW:gapG); if(G.key!=null) left=cur==null?G.key-w/2:Math.max(left,G.key-w/2);
+      G.slots.forEach((id,i)=>{ const n=byId[id]; n.x=Math.round(left+i*colW); n.y=y; X[id]=n.x+NW/2; }); placed.add(G); cur=left+w; depth=Math.max(depth,Math.max(G.L.length,G.R.length)-1); });
+    y+=NH+(depth>0?24+depth*30:0)+(list.some(G=>!G.solo)?140:60); };
+  const ready=G=>!placed.has(G)&&[...G.pg].every(p=>placed.has(p));
+  const roots=groups.filter(G=>!G.pg.size&&!G.solo).sort((a,b)=>byId[a.hub].y-byId[b.hub].y||byId[a.hub].x-byId[b.hub].x);
+  roots.forEach(R=>{ if(placed.has(R)) return; line([R]); let fam=new Set([R]);
+    for(let k=0;k<12;k++){ const next=groups.filter(G=>ready(G)&&G.pg.size&&[...G.pg].some(p=>fam.has(p))); if(!next.length) break; line(next); fam=new Set(next); } });
+  for(let k=0;k<20;k++){ const next=groups.filter(G=>ready(G)&&!G.solo); if(!next.length) break; line(next); }
+  const left=groups.filter(G=>!placed.has(G)); for(let i=0;i<left.length;i+=3) line(left.slice(i,i+3).map(G=>{ G.pg=new Set(); G.pn=[]; return G; }));
   touchBoard(); render(); fit(); }
 sheet.addEventListener('click',e=>{ const t=e.target.closest('[data-tree]'); if(t){ openTree(t.dataset.tree); return; } if(e.target.closest('[data-tidy]')){ closeSheet(); tidyBoard(); toast(PL2.tidied); } });
 
