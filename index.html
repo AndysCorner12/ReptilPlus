@@ -250,6 +250,25 @@ h1{font-family:var(--f-display);font-weight:400;font-size:20px;letter-spacing:.0
 .ln.fam,.fam{fill:none;stroke:var(--muted);stroke-width:2.2;stroke-dasharray:3 6;stroke-linecap:round}
 .gbig{width:52px;height:52px;border-radius:14px;border:2.5px dashed var(--muted);display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 auto}
 .gbig svg{width:28px;height:28px}
+.cwin{grid-column:1/-1;font-size:12.5px;color:var(--muted);padding-top:2px}
+.cwin.now{color:var(--ok);font-weight:700} .cwin.late{color:var(--danger);font-weight:700} .cwin.made{color:var(--ok)}
+.crow .cmake{grid-column:1/-1;margin-top:6px;justify-content:center}
+.crow .cmake svg{width:18px;height:18px}
+.treewrap{overflow-x:auto;margin:0 -4px 6px;padding:0 4px 6px}
+.treehead{display:grid;gap:8px;margin-bottom:6px}
+.treehead span{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.tree{display:grid;gap:6px 8px}
+.tcw{display:flex;align-items:center;min-width:0}
+.tc{display:flex;align-items:center;gap:7px;width:100%;min-width:0;padding:6px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);text-align:left}
+.tc.m{border-color:var(--male)} .tc.f{border-color:var(--fem)} .tc.pl{border-style:dashed}
+.tc .tav{width:36px;height:36px;font-size:14px;border-width:2px;border-radius:9px;flex:0 0 auto}
+.tc.m .tav{border-color:var(--male);background-color:var(--male-bg);color:var(--male-ink)} .tc.f .tav{border-color:var(--fem);background-color:var(--fem-bg);color:var(--fem-ink)}
+.tc .tt{display:grid;min-width:0}
+.tc .tt b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc .tt small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc.unk{justify-content:center;color:var(--muted);border-style:dashed;height:48px}
+.tc.ext{border-style:dotted}
+.kids{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:430px){h1{font-size:18px}.pill{padding:0 8px;height:32px;min-width:32px}}
 </style>
@@ -265,6 +284,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:20px;letter-spacing:.0
     </div>
     <div class="hbtns">
       <button class="pill" id="warnBtn" hidden></button>
+      <button class="pill" id="eggBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 0 7 5.5 7 10a7 7 0 0 1-14 0c0-4.5 3.5-10 7-10z"/></svg><span id="eggN"></span></button>
       <button class="pill" id="undoBtn" hidden aria-label="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
       <button class="pill" id="weighBtn" aria-label="Pesajes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M6 6h12l2 14H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span id="weighN"></span></button>
       <button class="pill" id="fitBtn" aria-label="Ver todo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/></svg></button>
@@ -395,7 +415,7 @@ const isVisita=g=>g.status==='visita';
 const isActive=g=>!g.planned&&!(g.status==='vendido'||g.status==='fallecido'||(isVisita(g)&&g.hasta&&g.hasta<today()));
 const CATS=['RTB','RTB PROVEN','PET','CRÍA','HOLDBACK','EN VENTA'];
 const CATSHORT={'RTB':'RTB','RTB PROVEN':'PROVEN','PET':'PET','CRÍA':'CRÍA','HOLDBACK':'HOLDBACK','EN VENTA':'EN VENTA'};
-const STATUS={propio:'Propio',visita:'Visita (préstamo)',reservado:'Reservado',vendido:'Vendido',fallecido:'Fallecido'};
+const STATUS={externo:'Externo (de otro criador, solo para planear)',propio:'Propio',visita:'Visita (préstamo)',reservado:'Reservado',vendido:'Vendido',fallecido:'Fallecido'};
 
 /* ---------- weights ---------- */
 function wSorted(g){ return (g.weights||[]).slice().sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0); }
@@ -429,13 +449,15 @@ function predict0(a,b){ const out=[]; let lethal=false;
   return {out,lethal}; }
 function related(a,b){ const r0=related0(a,b); if(r0||!a||!b) return r0;
   const gp=x=>[x.padre,x.madre].filter(Boolean).flatMap(id=>{ const p=geckos[id]; return p?[p.padre,p.madre].filter(Boolean):[]; });
-  const ga=gp(a), gb=gp(b); if(ga.includes(b.id)||gb.includes(a.id)) return PL.grandkid; if(ga.some(x=>gb.includes(x))) return PL.cousins; return null; }
+  const ga=gp(a), gb=gp(b); if(ga.includes(b.id)||gb.includes(a.id)) return PL.grandkid; if(ga.some(x=>gb.includes(x))) return PL.cousins;
+  const anc=(x,d,acc)=>{ if(!x||d>4) return acc; [x.padre,x.madre].forEach(id=>{ if(id&&geckos[id]&&!acc.has(id)){ acc.add(id); anc(geckos[id],d+1,acc); } }); return acc; };
+  const A=anc(a,1,new Set()), B=anc(b,1,new Set()); if(A.has(b.id)||B.has(a.id)) return PL2.ancestor; const cm=[...A].find(x=>B.has(x)); if(cm) return PL2.commonAnc(geckos[cm].name); return null; }
 function related0(a,b){ if(!a||!b) return null; const pa=[a.padre,a.madre].filter(Boolean), pb=[b.padre,b.madre].filter(Boolean);
   if(pa.includes(b.id)||pb.includes(a.id)) return 'padre/madre e hijo';
   const shared=pa.filter(x=>pb.includes(x)); if(shared.length) return shared.length===2?'hermanos':'medio hermanos'; return null; }
 
 /* ---------- warnings ---------- */
-function geckoIssues(g){ const out=[]; if(!g||g.planned) return out; const wi=wInfo(g); const m=monthsOld(g.birth);
+function geckoIssues(g){ const out=[]; if(!g||g.planned) return out; const wi=g.status==='externo'?null:wInfo(g); const m=monthsOld(g.birth);
   if(g.sex==='F'){ if(wi&&wi.g>0&&wi.g<MIN_W_F) out.push(`${g.name} pesa ${fmtG(wi.g)} g. Lo habitual es esperar a que pase de ${MIN_W_F} g.`);
     if(m!==null&&m<MIN_M) out.push(`${g.name} tiene ${ageText(g.birth).toLowerCase()}. Mejor esperar a los ${MIN_M} meses.`); }
   if(g.sex==='M'){ if(wi&&wi.g>0&&wi.g<MIN_W_M) out.push(`${g.name} pesa ${fmtG(wi.g)} g, poco para un macho reproductor (orientativo: ${MIN_W_M} g).`);
@@ -477,7 +499,7 @@ function initial(g){ return esc((g.name||'?').trim().charAt(0).toUpperCase()); }
 function nodeHTML(n){ const g0=gOf(n); if(g0&&g0.planned) return ghostHTML(n,g0); return nodeHTML0(n); }
 function nodeHTML0(n){ const g=gOf(n); if(!g) return ''; const c=g.sex==='M'?'m':g.sex==='F'?'f':'u'; const iss=nodeIssue(n); const wi=wInfo(g);
   return `<div class="node ${c}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px">
-    <div class="ph${g.photo?' has':''}"${photoStyle(g)}>${initial(g)}<span class="sx">${sxLabel(g)}</span>${iss?`<span class="wb ${iss}">!</span>`:''}${isVisita(g)?'<span class="vis">VISITA</span>':g.cat?`<span class="vis cat">${esc(CATSHORT[g.cat]||g.cat)}</span>`:''}</div>
+    <div class="ph${g.photo?' has':''}"${photoStyle(g)}>${initial(g)}<span class="sx">${sxLabel(g)}</span>${iss?`<span class="wb ${iss}">!</span>`:''}${g.status==='externo'?`<span class="vis">${PL2.extBadge}</span>`:isVisita(g)?'<span class="vis">VISITA</span>':g.cat?`<span class="vis cat">${esc(CATSHORT[g.cat]||g.cat)}</span>`:''}</div>
     <div class="meta"><b>${esc(g.name)}</b><span class="mo">${esc(g.morph||'Morph sin indicar')}</span><span>${esc(ageShort(g.birth))}${wi?` <span class="wt">· ${fmtG(wi.g)} g</span>`:''}</span></div></div>`; }
 function center(n){ return {x:n.x+NW/2,y:n.y+NH/2}; }
 function drawLines(){ drawLines0(); svgL.insertAdjacentHTML('afterbegin',famLines()); }
@@ -497,7 +519,7 @@ function drawLines0(){ let h='';
   svgL.innerHTML=h; }
 function trayList(){ const q=search.trim().toLowerCase();
   return Object.values(geckos).filter(g=>{ if(g.planned) return false; if(q) return (g.name+' '+(g.morph||'')).toLowerCase().includes(q);
-    if(filter==='all') return isActive(g); if(filter==='visita') return isVisita(g); if(filter==='vendido') return g.status==='vendido'||g.status==='fallecido'; if(!isActive(g)) return false;
+    if(filter==='all') return isActive(g); if(filter==='visita') return isVisita(g)||g.status==='externo'; if(filter==='vendido') return g.status==='vendido'||g.status==='fallecido'; if(!isActive(g)) return false;
     if(filter.startsWith('c:')) return (g.cat||'')===filter.slice(2); return (g.sex||'U')===filter; })
     .sort((a,b)=>{ const ci=g=>{ const i=CATS.indexOf(g.cat||''); return i<0?9:i; }; const sa=ci(a), sb=ci(b); if(sa!==sb) return sa-sb; return (a.sex||'U').localeCompare(b.sex||'U')||a.name.localeCompare(b.name,'es'); }); }
 function render(){
@@ -512,9 +534,10 @@ function render(){
   $('#undoBtn').hidden=!undoStack.length;
   const groups=new Set(board.links.filter(l=>l.k==='pair').map(l=>l.m)).size, opts=board.links.filter(l=>l.k==='opt').length, juntos=board.links.filter(l=>l.k==='pair'&&l.status==='juntos').length;
   $('#sub').textContent=!loaded?'Cargando…':`${groups} ${groups===1?'grupo':'grupos'}${juntos?` · ${juntos} juntos`:''} · ${opts} ${opts===1?'opción':'opciones'}`;
+  { const inc=allIncubating(), eb=$('#eggBtn'); eb.hidden=!inc.length; if(inc.length){ const soon=inc.filter(x=>x.h.st!=='wait'||x.h.inDays<=7).length; $('#eggN').textContent=String(soon||inc.length); eb.classList.toggle('warn',soon>0); eb.setAttribute('aria-label',PL2.eggAria); } }
   const w=allWarnings(), wb=$('#warnBtn'); wb.hidden=!w.length;
   if(w.length){ wb.className='pill '+(w.some(x=>x.t==='bad')?'bad':'warn'); wb.textContent=`! ${w.length}`; }
-  const due=all.filter(g=>g.status!=='vendido'&&(()=>{ const wi=wInfo(g); return !wi||wi.days>WEIGH_DAYS; })()).length;
+  const due=all.filter(g=>g.status!=='vendido'&&g.status!=='externo'&&(()=>{ const wi=wInfo(g); return !wi||wi.days>WEIGH_DAYS; })()).length;
   $('#weighN').textContent=due?String(due):''; $('#weighBtn').classList.toggle('warn',due>0);
   const em=$('#empty');
   if(!loaded) em.innerHTML='';
@@ -753,6 +776,7 @@ function openNodeSheet(nid){ const n=nodeById(nid), g=gOf(n); if(!g) return; if(
     <div class="acts">
       <div class="act upl">${IC.cam}<span>${g.photo?'Cambiar foto':'Poner foto'}</span><input type="file" id="a-photo" accept="image/*" aria-label="Elegir foto"></div>
       <div class="pastebox" id="a-help" hidden><p>Tu app no ha abierto el selector de fotos. Copia la foto en la galería y pégala aquí, o abre el tablero en el navegador del móvil.</p><input type="text" id="a-pastein" inputmode="none" placeholder="Mantén pulsado aquí y pega" autocomplete="off"></div>
+      <button class="act" data-tree="${esc(g.id)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M12 7.5v4M6 16.5V14h12v2.5"/></svg><span>${PL2.tree}</span></button>
       <button class="act" id="a-weigh">${IC.scale}<span>Pesar hoy</span></button>
       <button class="act" id="a-edit">${IC.edit}<span>Editar ficha</span></button>
       <button class="act" id="a-dup">${IC.copy}<span>Duplicar en el tablero</span></button>
@@ -785,7 +809,7 @@ function openWeigh(gid,back){ const g=geckos[gid]; if(!g) return; const w=wSorte
   sheet.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ g.weights=(g.weights||[]).filter(x=>x.d!==b.dataset.del); saveGecko(g); openWeigh(gid,back); });
   $('#w-back').onclick=()=>back?back():openGeckoForm(gid); }
 
-function openWeighAll(){ const all=Object.values(geckos).filter(g=>isActive(g)).map(g=>({g,wi:wInfo(g)}))
+function openWeighAll(){ const all=Object.values(geckos).filter(g=>isActive(g)&&g.status!=='externo').map(g=>({g,wi:wInfo(g)}))
     .sort((a,b)=>{ const da=a.wi?a.wi.days:1e9, db=b.wi?b.wi.days:1e9; return db-da||a.g.name.localeCompare(b.g.name,'es'); });
   const due=all.filter(x=>!x.wi||x.wi.days>WEIGH_DAYS).length, down=all.filter(x=>x.wi&&x.wi.delta!==null&&x.wi.delta<0).length;
   openSheet(`<div class="sh"><div><h3>Pesajes</h3><p>${all.length} geckos · ${due} sin pesar en ${WEIGH_DAYS} días · ${down} han bajado</p></div></div>
@@ -798,7 +822,8 @@ function openWeighAll(){ const all=Object.values(geckos).filter(g=>isActive(g)).
 
 function clutchRes(c){ if(c.nac>0) return 'nac'; if(c.fert===0||c.nac===0) return 'mal'; return 'inc'; }
 function clutchTotals(cl){ return {n:cl.length,p:cl.length,h:cl.reduce((s,c)=>s+(+c.n||0),0),f:cl.reduce((s,c)=>s+(c.fert??(c.res==='mal'?0:c.res==='nac'?c.n:0)),0),b:cl.reduce((s,c)=>s+(c.nac??(c.res==='nac'?c.n:0)),0)}; }
-function clutchRow(c){ const res=c.res||clutchRes(c); const inc=res==='inc'; const dd=c.dn&&c.d?Math.round((new Date(c.dn)-new Date(c.d))/864e5):null; const di=inc?daysSince(c.d):null;
+function clutchRow(c){ return clutchRow0(c).replace(/<\/div>$/,clutchExtra(c)+'</div>'); }
+function clutchRow0(c){ const res=c.res||clutchRes(c); const inc=res==='inc'; const dd=c.dn&&c.d?Math.round((new Date(c.dn)-new Date(c.d))/864e5):null; const di=inc?daysSince(c.d):null;
   const bits=[`${c.n} huevo${c.n>1?'s':''}`]; if(c.fert!=null) bits.push(`${c.fert} fértil${c.fert===1?'':'es'}`);
   const st=res==='nac'?`<span class="up">${c.nac??c.n} nacida${(c.nac??c.n)===1?'':'s'}${c.dn?' el '+fmtD(c.dn):''}${dd?` (${dd} d)`:''}</span>`:res==='mal'?'<span class="dn">no viable'+(c.n>1?'s':'')+'</span>':`incubando${di!==null?` · ${di} d`:''}`;
   return `<div class="wrow crow"><span class="d">${fmtD(c.d)}</span><span>${bits.join(' · ')} · ${st}</span><span style="display:flex;gap:2px"><button data-cres="${c.id}" aria-label="Apuntar resultado">${IC.egg}</button><button data-cdel="${c.id}" aria-label="Borrar puesta">${IC.trash}</button></span></div>`; }
@@ -833,6 +858,7 @@ function openLinkSheet(lid){ const l=board.links.find(x=>x.id===lid); if(!l) ret
       const opts=(max,v)=>Array.from({length:max+1},(_,i)=>`<option value="${i}"${v===i?' selected':''}>${i}</option>`).join('');
       row.insertAdjacentHTML('beforeend',`<div class="cedit"><label class="fld"><span>Fértiles</span><select data-k="fert">${opts(c.n,c.fert??(c.res==='mal'?0:c.n))}</select></label><label class="fld"><span>Nacidas</span><select data-k="nac"><option value="">—</option>${opts(c.n,c.nac??-1)}</select></label><label class="fld"><span>Nacimiento</span><input type="date" data-k="dn" value="${esc(c.dn||'')}"></label><button class="act primary sm" data-csave>Guardar</button></div>`);
       row.querySelector('[data-csave]').onclick=()=>{ snap(); read(); c.fert=+row.querySelector('[data-k=fert]').value; const nv=row.querySelector('[data-k=nac]').value; c.nac=nv===''?null:+nv; c.dn=row.querySelector('[data-k=dn]').value||''; if(c.dn&&c.nac===null) c.nac=c.fert; c.res=clutchRes(c); touchBoard(); render(); openLinkSheet(lid); }; });
+    sheet.querySelectorAll('[data-cmake]').forEach(b=>b.onclick=()=>{ const c=l.clutches.find(x=>x.id===b.dataset.cmake); if(c) makeBabies(l,c,m,f,lid); });
     sheet.querySelectorAll('[data-cdel]').forEach(b=>b.onclick=()=>{ snap(); read(); l.clutches=l.clutches.filter(x=>x.id!==b.dataset.cdel); touchBoard(); render(); openLinkSheet(lid); }); }
   { const ab=$('#a-baby'); if(ab) ab.onclick=()=>addPlannedBaby(lid); }
   $('#a-unl').onclick=()=>{ snap(); board.links=board.links.filter(x=>x.id!==lid); touchBoard(); render(); closeSheet(); };
@@ -853,7 +879,7 @@ function parentOptions(sel,sex,self){ const keep=sel&&!(geckos[sel]&&(geckos[sel
 function openGeckoForm(id){ const g=id?geckos[id]:null; if(g&&g.planned){ openGhostSheet(g.id); return; } let photo=g&&okPhoto(g.photo)?g.photo:''; const sex=g?g.sex||'U':'U'; const status=g?g.status||'propio':'propio';
   const onBoard=g&&board.nodes.some(n=>n.g===g.id);
   openSheet(`${g?`<div class="sh">${avatar(g,52)}<div><h3>${esc(g.name)} ${sxLabel(g)}</h3><p>${esc(g.morph||'')}</p></div></div>
-    <div class="acts" style="margin-bottom:14px"><button class="act primary" id="f-place">${IC.board}<span>${onBoard?'Poner otra copia en el tablero':'Poner en el tablero'}</span></button><button class="act" id="f-weigh">${IC.scale}<span>Pesajes${(()=>{ const wi=wInfo(g); return wi?` · ${fmtG(wi.g)} g hace ${wi.days} d`:''; })()}</span></button></div>`:''}
+    <div class="acts" style="margin-bottom:14px"><button class="act primary" id="f-place">${IC.board}<span>${onBoard?'Poner otra copia en el tablero':'Poner en el tablero'}</span></button><button class="act" data-tree="${esc(g.id)}"><span>${PL2.tree}</span></button><button class="act" id="f-weigh">${IC.scale}<span>Pesajes${(()=>{ const wi=wInfo(g); return wi?` · ${fmtG(wi.g)} g hace ${wi.days} d`:''; })()}</span></button></div>`:''}
     <form class="form" id="gform" novalidate>
       <div class="photo"><div class="pv${photo?' has':''}" id="f-pv" style="${photo?`background-image:url('${photo}')`:''}">${photo?'':IC.cam}</div>
         <div class="act upl" style="flex:1">${IC.cam}<span id="f-plabel">${photo?'Cambiar foto':'Subir foto'}</span><input type="file" id="f-photo" accept="image/*" aria-label="Elegir foto"></div></div>
@@ -879,7 +905,7 @@ function openGeckoForm(id){ const g=id?geckos[id]:null; if(g&&g.planned){ openGh
       <label class="fld"><span>Proyecto</span><input type="text" id="f-project" maxlength="40" placeholder="Cuervo Project" value="${esc(g?g.project||'':'')}"></label>
       <div class="fld"><span>Categoría</span><select id="f-cat"><option value="">—</option>${CATS.map(c=>`<option value="${c}"${g&&g.cat===c?' selected':''}>${c}</option>`).join('')}</select></div>
       <div class="fld"><span>Estado</span><select id="f-status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}"${status===k?' selected':''}>${v}</option>`).join('')}</select></div>
-      <div id="f-visita" ${status==='visita'?'':'hidden'}>
+      <div id="f-visita" ${status==='visita'||status==='externo'?'':'hidden'}>
         <label class="fld" style="margin-bottom:10px"><span>De quién es</span><input type="text" id="f-owner" maxlength="60" placeholder="Miguel" value="${esc(g?g.owner||'':'')}"></label>
         <div class="row2"><label class="fld"><span>Llegó</span><input type="date" id="f-desde" value="${esc(g?g.desde||'':'')}"></label><label class="fld"><span>Vuelve</span><input type="date" id="f-hasta" value="${esc(g?g.hasta||'':'')}"></label></div>
       </div>
@@ -897,7 +923,7 @@ function openGeckoForm(id){ const g=id?geckos[id]:null; if(g&&g.planned){ openGh
   sheet.querySelectorAll('#f-photo,.pvin').forEach(i=>{ i.onchange=onPhoto; i.addEventListener('click',()=>watchPicker(()=>{ $('#f-paste').hidden=false; })); });
   $('#f-pastein').addEventListener('paste',async e=>{ const f=pastedImage(e); if(!f){ return; } e.preventDefault(); await onPhoto({target:{files:[f],set value(v){}}}); $('#f-paste').hidden=true; });
   $('#f-birth').oninput=e=>{ $('#f-age').textContent=e.target.value?'Edad: '+ageText(e.target.value):'Con la fecha de nacimiento calculo la edad sola.'; };
-  $('#f-status').onchange=e=>{ $('#f-visita').hidden=e.target.value!=='visita'; };
+  $('#f-status').onchange=e=>{ $('#f-visita').hidden=!['visita','externo'].includes(e.target.value); };
   $('#f-name').oninput=()=>{ $('#f-err').hidden=true; };
   if(g) armDanger($('#f-del'),'Toca otra vez para borrar',()=>{ deleteGecko(g.id); closeSheet(); toast(`${g.name} borrado.`); });
   $('#gform').onsubmit=e=>{ e.preventDefault(); const name=$('#f-name').value.trim();
@@ -960,7 +986,7 @@ function openGhostSheet(gid,nid){ const g=geckos[gid]; if(!g) return; const pa=g
       <label class="fld"><span>${PL.notes}</span><textarea id="gh-notes" maxlength="500">${esc(g.notes||'')}</textarea></label>
       <div class="acts"><button class="act primary" type="submit" style="justify-content:center">${PL.save}</button></div>
     </form>
-    <div class="acts" style="margin-top:8px"><button class="act" id="gh-hatch">${IC.egg}<span>${PL.hatched}</span></button><button class="act danger" id="gh-del">${IC.trash}<span>${PL.removeBaby}</span></button></div>`);
+    <div class="acts" style="margin-top:8px"><button class="act" data-tree="${esc(g.id)}">${PL2.tree}</button><button class="act" id="gh-hatch">${IC.egg}<span>${PL.hatched}</span></button><button class="act danger" id="gh-del">${IC.trash}<span>${PL.removeBaby}</span></button></div>`);
   $('#gh-form').onsubmit=e=>{ e.preventDefault(); const name=$('#gh-name').value.trim()||g.name; const sx=(document.querySelector('input[name=ghsx]:checked')||{}).value||'U';
     const ng={...g,name,sex:sx,morph:$('#gh-morph').value.trim(),notes:$('#gh-notes').value.trim()};
     if(sx!=='U'){ Object.entries(boards).forEach(([bid,b])=>{ const ids=new Set(b.nodes.filter(n=>n.g===g.id).map(n=>n.id)); const before=b.links.length;
@@ -968,6 +994,74 @@ function openGhostSheet(gid,nid){ const g=geckos[gid]; if(!g) return; const pa=g
     saveGecko(ng); closeSheet(); toast(PL.saved); };
   $('#gh-hatch').onclick=()=>{ const y=new Date().getFullYear(); const ng={...g,planned:false,birth:today(),grupo:PL.group(y),cat:PL.juvCat,sexSure:g.sex==='U'?true:false}; saveGecko(ng); toast(PL.hatchedToast(ng.name)); openGeckoForm(ng.id); };
   armDanger($('#gh-del'),PL.removeBaby+' ✓',()=>{ deleteGecko(g.id); closeSheet(); toast(PL.removed); }); }
+
+const PL2={tree:'Árbol familiar',treeTitle:'Árbol familiar',cols:['Gecko','Padres','Abuelos','Bisabuelos'],kids:'Crías',noKids:'Sin crías registradas.',treeHint:'Toca un gecko del árbol para ver el suyo.',
+  tidy:'Ordenar tablero (padres arriba, crías debajo)',tidied:'Tablero ordenado. Puedes deshacerlo con la flecha.',
+  make:n=>`Crear ${n} cría${n>1?'s':''} en la colección`,made:(n,c)=>`${n} cría${n>1?'s':''} creada${n>1?'s':''} (${c}). Están en la colección, filtro «Crías».`,madeList:'Crías creadas:',fromClutch:d=>`Nacida de la puesta del ${d}.`,
+  hatchWin:(a,b)=>`Nacimiento aprox. ${a} – ${b}`,dueNow:'¡ya en fecha!',late:'pasada la fecha prevista',inDays:n=>`en ${n} d`,
+  eggTitle:'Incubando',eggSub:n=>`${n} puesta${n>1?'s':''} en incubadora. Fechas según tus incubaciones anteriores.`,eggEmpty:'No hay puestas incubando.',laid:d=>`puesta ${d}`,eggs:n=>`${n} huevo${n>1?'s':''}`,eggAria:'Puestas incubando',
+  extBadge:'EXTERNO',ancestor:'antepasado y descendiente',commonAnc:n=>`parientes (antepasado común: ${n})`,
+  helpMore:'Más: «Árbol familiar» en cada ficha; el huevo de arriba avisa de las puestas a punto de nacer; cuando una puesta nace, crea sus crías en la colección con un toque; en el menú del tablero, «Ordenar tablero» coloca padres arriba y crías debajo; para planear con machos de otros criadores, márcalos con estado «Externo».'};
+const EGG_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 0 7 5.5 7 10a7 7 0 0 1-14 0c0-4.5 3.5-10 7-10z"/></svg>';
+function addDays(s,n){ const [y,m,d]=s.split('-').map(Number); return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10); }
+function daysUntil(s){ const [y,m,d]=s.split('-').map(Number); const t=new Date(); return Math.round((Date.UTC(y,m-1,d)-Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()))/864e5); }
+function incWindow(){ const ds=[]; Object.values(boards).forEach(b=>(b.links||[]).forEach(l=>(l.clutches||[]).forEach(c=>{ if(c.dn&&c.d){ const d=Math.round((new Date(c.dn)-new Date(c.d))/864e5); if(d>40&&d<130) ds.push(d); } })));
+  if(ds.length>=3){ const a=ds.reduce((x,y)=>x+y,0)/ds.length; return [Math.round(a-10),Math.round(a+10)]; } return [60,90]; }
+function hatchInfo(c){ const [lo,hi]=incWindow(); const a=addDays(c.d,lo), b=addDays(c.d,hi), t=today(); const st=t>b?'late':t>=a?'now':'wait'; return {a,b,st,inDays:st==='wait'?daysUntil(a):0}; }
+function allIncubating(){ const out=[]; Object.entries(boards).forEach(([bid,b])=>(b.links||[]).forEach(l=>{ if(l.k!=='pair') return; const nm=id=>{ const n=(b.nodes||[]).find(x=>x.id===id); return n&&geckos[n.g]; }; const m=nm(l.m), f=nm(l.f); if(!m||!f) return;
+    (l.clutches||[]).forEach(c=>{ if((c.res||clutchRes(c))==='inc'&&!c.dn&&c.d) out.push({bid,b,l,c,m,f,h:hatchInfo(c)}); }); }));
+  return out.sort((x,y)=>x.h.a<y.h.a?-1:1); }
+function clutchExtra(c){ const res=c.res||clutchRes(c); let h='';
+  if(res==='inc'&&!c.dn&&c.d){ const i=hatchInfo(c); h+=`<div class="cwin ${i.st}">${PL2.hatchWin(fmtD(i.a),fmtD(i.b))} · ${i.st==='now'?PL2.dueNow:i.st==='late'?PL2.late:PL2.inDays(i.inDays)}</div>`; }
+  if(res==='nac'&&(c.nac||0)>0){ const made=(c.made||[]).map(id=>geckos[id]).filter(Boolean);
+    h+=made.length?`<div class="cwin made">${PL2.madeList} ${made.map(g=>esc(g.name)).join(', ')}</div>`:`<button class="act sm cmake" data-cmake="${esc(c.id)}">${EGG_SVG}<span>${PL2.make(c.nac)}</span></button>`; }
+  return h; }
+function babyCode(m,f){ const ab=x=>(x||'').normalize('NFD').replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase()||'XX'; return ab(m.name)+'x'+ab(f.name); }
+function makeBabies(l,c,m,f,lid){ const n=c.nac||0; if(!n||(c.made||[]).length) return; const code=babyCode(m,f);
+  let k=Math.max(0,...Object.values(geckos).map(g=>g.name||'').filter(nm=>nm.startsWith(code+'-')).map(nm=>parseInt(nm.slice(code.length+1))||0));
+  const dn=c.dn||today(), y=+dn.slice(0,4), ids=[];
+  for(let i=0;i<n;i++){ k++; const id=uid('g'); ids.push(id); saveGecko({id,name:`${code}-${k}`,sex:'U',sexSure:true,morph:expectedMorph(m,f),birth:dn,grupo:PL.group(y),cat:PL.juvCat,padre:m.id,madre:f.id,project:m.project||f.project||'',status:'propio',owner:'',desde:'',hasta:'',notes:PL2.fromClutch(fmtD(c.d)),photo:'',weights:[],created:Date.now()}); }
+  snap(); c.made=ids; touchBoard(); render(); openLinkSheet(lid); toast(PL2.made(n,code)); }
+function openEggSheet(){ const inc=allIncubating();
+  openSheet(`<div class="sh"><span class="gbig">${EGG_SVG}</span><div><h3>${PL2.eggTitle}</h3><p>${inc.length?PL2.eggSub(inc.length):PL2.eggEmpty}</p></div></div>
+    <div class="acts">${inc.map((x,i)=>`<button class="prow" data-egg="${i}" style="display:grid;gap:3px;text-align:left"><b style="white-space:normal">${esc(x.m.name)} × ${esc(x.f.name)}</b><small>${PL2.laid(fmtD(x.c.d))} · ${PL2.eggs(x.c.n)} · ${esc(x.b.name)}</small><span class="cwin ${x.h.st}">${PL2.hatchWin(fmtD(x.h.a),fmtD(x.h.b))} · ${x.h.st==='now'?PL2.dueNow:x.h.st==='late'?PL2.late:PL2.inDays(x.h.inDays)}</span></button>`).join('')}</div>`);
+  sheet.querySelectorAll('[data-egg]').forEach(btn=>btn.onclick=()=>{ const x=inc[+btn.dataset.egg]; if(x.bid!==cur) switchBoard(x.bid); openLinkSheet(x.l.id); }); }
+function treeCell(id){ const g=id&&geckos[id]; if(!id) return `<div class="tc unk">?</div>`; if(!g) return `<div class="tc ext"><span class="tt"><b>${esc(id)}</b></span></div>`;
+  const c=g.sex==='M'?'m':g.sex==='F'?'f':''; const ph=okPhoto(g.photo);
+  return `<button class="tc ${c}${g.planned?' pl':''}" data-tree="${esc(g.id)}"><span class="tav${ph?' has':''}"${ph?` style="background-image:url('${g.photo}')"`:''}>${initial(g)}</span><span class="tt"><b>${esc(g.name)}</b><small>${esc(g.morph||'')}</small></span></button>`; }
+function openTree(gid){ const g=geckos[gid]; if(!g) return; const par=x=>{ const o=x&&geckos[x]; return o?[o.padre||'',o.madre||'']:['','']; };
+  const L1=[g.padre||'',g.madre||''], L2=L1.flatMap(par), L3=L2.flatMap(par), deep=L3.some(Boolean), R=deep?8:4, C=deep?4:3;
+  let h=`<div class="tree" style="grid-template-columns:repeat(${C},128px);grid-template-rows:repeat(${R},minmax(54px,auto))">`;
+  for(let i=0;i<C;i++) h+='';
+  h+=`<div class="tcw" style="grid-column:1;grid-row:1/span ${R}">${treeCell(g.id)}</div>`;
+  L1.forEach((id,i)=>h+=`<div class="tcw" style="grid-column:2;grid-row:${i*R/2+1}/span ${R/2}">${treeCell(id)}</div>`);
+  L2.forEach((id,i)=>h+=`<div class="tcw" style="grid-column:3;grid-row:${i*R/4+1}/span ${R/4}">${treeCell(id)}</div>`);
+  if(deep) L3.forEach((id,i)=>h+=`<div class="tcw" style="grid-column:4;grid-row:${i+1}">${treeCell(id)}</div>`);
+  h+='</div>';
+  const kids=Object.values(geckos).filter(x=>(x.padre===g.id||x.madre===g.id)&&(!x.planned||ghostAlive(x)));
+  openSheet(`<div class="sh">${avatar(g,52)}<div><h3>${PL2.treeTitle}</h3><p>${esc(g.name)} · ${PL2.treeHint}</p></div></div>
+    <div class="treewrap"><div class="treehead" style="grid-template-columns:repeat(${C},128px)">${PL2.cols.slice(0,C).map(t=>`<span>${t}</span>`).join('')}</div>${h}</div>
+    <p class="secttl">${PL2.kids}</p>${kids.length?`<div class="kids">${kids.map(x=>treeCell(x.id)).join('')}</div>`:`<p class="hint">${PL2.noKids}</p>`}`); }
+function tidyBoard(){ const N=board.nodes.filter(n=>gOf(n)); if(!N.length) return; snap();
+  const byId=Object.fromEntries(N.map(n=>[n.id,n])); const pairs=board.links.filter(l=>l.k==='pair'&&byId[l.m]&&byId[l.f]); const opts=board.links.filter(l=>l.k==='opt'&&byId[l.m]&&byId[l.f]);
+  const groups=[], inG=new Set();
+  [...new Set(pairs.map(l=>l.m))].forEach(mid=>{ const fs=pairs.filter(l=>l.m===mid).map(l=>l.f).filter(f=>!inG.has(f)); groups.push({top:mid,bottom:fs}); inG.add(mid); fs.forEach(f=>inG.add(f)); });
+  opts.forEach(l=>[l.m,l.f].forEach(id=>{ if(!inG.has(id)){ groups.push({top:id,bottom:[]}); inG.add(id); } }));
+  N.forEach(n=>{ if(!inG.has(n.id)){ groups.push({top:n.id,bottom:[]}); inG.add(n.id); } });
+  const nodeOfG={}; N.forEach(n=>{ (nodeOfG[n.g]=nodeOfG[n.g]||[]).push(n.id); });
+  const memo={}; const gen=(nid,d)=>{ if(memo[nid]!=null) return memo[nid]; if(d>8) return 0; const g=gOf(byId[nid]); let v=0; [g.padre,g.madre].forEach(pg=>(nodeOfG[pg]||[]).forEach(pn=>{ if(pn!==nid) v=Math.max(v,gen(pn,d+1)+1); })); memo[nid]=v; return v; };
+  groups.forEach(G=>{ G.gen=Math.max(...[G.top,...G.bottom].map(id=>gen(id,0))); G.w=Math.max(1,G.bottom.length); });
+  const rows={}; groups.forEach(G=>(rows[G.gen]=rows[G.gen]||[]).push(G));
+  const colW=NW+28, gapG=70, vGap=60, rowGap=120; const placedX={}; let y=0;
+  Object.keys(rows).map(Number).sort((a,b)=>a-b).forEach(r=>{ const list=rows[r];
+    list.forEach(G=>{ const xs=[]; [G.top,...G.bottom].forEach(id=>{ const g=gOf(byId[id]); [g.padre,g.madre].forEach(pg=>(nodeOfG[pg]||[]).forEach(pn=>{ if(placedX[pn]!=null) xs.push(placedX[pn]); })); }); G.key=xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:byId[G.top].x; });
+    list.sort((a,b)=>a.key-b.key); let x=0, two=false;
+    list.forEach(G=>{ const w=G.w*colW, cx=x+w/2, t=byId[G.top]; t.x=Math.round(cx-NW/2); t.y=y; placedX[t.id]=cx;
+      G.bottom.forEach((fid,i)=>{ const f=byId[fid], fx=x+i*colW+colW/2; f.x=Math.round(fx-NW/2); f.y=y+NH+vGap; placedX[fid]=fx; }); if(G.bottom.length) two=true; x+=w+gapG; });
+    const shift=Math.round(-(x-gapG)/2); list.forEach(G=>[G.top,...G.bottom].forEach(id=>{ byId[id].x+=shift; placedX[id]+=shift; }));
+    y+=(two?2*NH+vGap:NH)+rowGap; });
+  touchBoard(); render(); fit(); }
+sheet.addEventListener('click',e=>{ const t=e.target.closest('[data-tree]'); if(t){ openTree(t.dataset.tree); return; } if(e.target.closest('[data-tidy]')){ closeSheet(); tidyBoard(); toast(PL2.tidied); } });
 
 function csvEsc(v){ v=String(v??''); return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
 function exportCSV(){ const rows=[['Nombre','Sexo','Sexo confirmado','Morph','Nacimiento','Edad','Grupo','Categoría','Estado','Dueño (visita)','Desde','Hasta','Padre','Madre','Proyecto','Último peso (g)','Fecha último pesaje','Peso anterior (g)','Variación (g)','Días sin pesar','Observaciones']];
@@ -987,7 +1081,7 @@ function exportCSV(){ const rows=[['Nombre','Sexo','Sexo confirmado','Morph','Na
   return '﻿'+rows.map(r=>r.map(csvEsc).join(';')).join('\r\n'); }
 
 /* ---------- boards & help ---------- */
-$('#undoBtn').onclick=undo; $('#weighBtn').onclick=openWeighAll;
+$('#undoBtn').onclick=undo; $('#eggBtn').onclick=openEggSheet; $('#weighBtn').onclick=openWeighAll;
 function openBoardsSheet(){ const ids=Object.keys(boards).sort((a,b)=>(boards[b].created||0)-(boards[a].created||0));
   const count=b=>{ const p=new Set(b.links.filter(l=>l.k==='pair').map(l=>l.m)).size; return `${p} ${p===1?'grupo':'grupos'} · ${b.nodes.length} fichas`; };
   openSheet(`<div class="sh"><div><h3>Tus tableros</h3><p>Uno por temporada, o para probar planes distintos.</p></div></div>
@@ -997,6 +1091,7 @@ function openBoardsSheet(){ const ids=Object.keys(boards).sort((a,b)=>(boards[b]
     <p class="secttl">Este tablero</p>
     <form class="inl" id="bren" style="margin-bottom:8px"><input type="text" id="bren-name" maxlength="40" value="${esc(board.name)}"><button class="act" type="submit">Renombrar</button></form>
     <div class="acts">
+      <button class="act" data-tidy="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="5" rx="1"/><rect x="3" y="16" width="6" height="5" rx="1"/><rect x="15" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M6 16v-4h12v4"/></svg><span>${PL2.tidy}</span></button>
       <button class="act" id="bdup">${IC.copy}<span>Duplicar para probar otro plan</span></button>
       ${ids.length>1?`<button class="act danger" id="bdel">${IC.trash}<span>Borrar «${esc(board.name)}»</span></button>`:''}
     </div>
@@ -1024,6 +1119,7 @@ $('#helpBtn').onclick=()=>openSheet(`<div class="sh"><div><h3>Cómo funciona</h3
     <li class="n"><i>7</i><span>Pellizca para hacer zoom, arrastra el fondo para moverte y usa la flecha para deshacer.</span></li>
     <li class="n"><i>8</i><span>Toca el nombre del tablero para cambiar de temporada, duplicarlo y exportar todo a Excel.</span></li>
   <li class="n"><i>9</i><span>${PL.helpBaby}</span></li>
+  <li class="n"><i>10</i><span>${PL2.helpMore}</span></li>
   </ul>
   <div class="legend">
     <div><svg width="44" height="10"><line x1="2" y1="5" x2="42" y2="5" stroke="var(--muted)" stroke-width="2.2" stroke-dasharray="3 6" stroke-linecap="round"/></svg>${PL.legendFam}</div>
