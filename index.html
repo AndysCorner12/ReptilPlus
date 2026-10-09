@@ -19,6 +19,9 @@
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 img{max-width:100%}
+.sxi{width:1.05em;height:1.05em;display:inline-block;vertical-align:-.17em;flex:none;overflow:visible}
+.sx .sxi{width:14px;height:14px;vertical-align:0}
+.sx{gap:1px;line-height:1}
 /* Layout: one-screen app — header, infinite corkboard canvas, collection tray along the bottom */
 :root{
   --bg:#F5F1E8; --board:#EFE8DA; --dot:#d6c9ae; --ink:#1d1a16; --muted:#6c6457; --card:#fffdf8; --line:#e0d6c2;
@@ -322,7 +325,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:20px;letter-spacing:.0
   <div id="tray">
     <div class="trayhead"><b>COLLECTION <span id="tcount"></span></b>
       <div class="filt" role="group" aria-label="Filter collection">
-        <button data-f="all" class="on">All</button><button data-f="M">♂</button><button data-f="F">♀</button><button data-f="U">?</button><button data-f="c:RTB">RTB</button><button data-f="c:RTB PROVEN">Proven</button><button data-f="c:PET">PET</button><button data-f="c:JUVENILE">Juveniles</button><button data-f="c:HOLDBACK">Holdback</button><button data-f="c:FOR SALE">For sale</button><button data-f="visita">On loan</button><button data-f="vendido">Sold</button><button data-f="search" id="searchF" aria-label="Search"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg></button>
+        <button data-f="all" class="on">All</button><button data-f="M"><svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="male"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L20 4M14.5 4H20v5.5"/></svg></button><button data-f="F"><svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="female"><circle cx="12" cy="9" r="6"/><path d="M12 15v7M8.5 18.5h7"/></svg></button><button data-f="U">?</button><button data-f="c:RTB">RTB</button><button data-f="c:RTB PROVEN">Proven</button><button data-f="c:PET">PET</button><button data-f="c:JUVENILE">Juveniles</button><button data-f="c:HOLDBACK">Holdback</button><button data-f="c:FOR SALE">For sale</button><button data-f="visita">On loan</button><button data-f="vendido">Sold</button><button data-f="search" id="searchF" aria-label="Search"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg></button>
       </div></div>
     <div class="trow" id="trow"></div>
   </div>
@@ -413,8 +416,9 @@ const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const nodeById=id=>board.nodes.find(n=>n.id===id);
 const gOf=n=>n&&geckos[n.g];
 const SX={M:'♂',F:'♀',U:'?'};
+const SXH={M:'<svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="male"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L20 4M14.5 4H20v5.5"/></svg>',F:'<svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="female"><circle cx="12" cy="9" r="6"/><path d="M12 15v7M8.5 18.5h7"/></svg>',U:'?'};
 const SXN={M:'Male',F:'Female',U:'Unsexed'};
-const sxLabel=g=>g.sex==='U'?'?':SX[g.sex]+(g.sexSure===false?'?':'');
+const sxLabel=g=>g.sex==='U'?'?':SXH[g.sex]+(g.sexSure===false?'?':'');
 const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const fmtD=s=>{ if(!s) return ''; const [y,m,d]=s.split('-'); return `${+d} ${MON[+m-1]} ${y}`; };
@@ -909,10 +913,10 @@ function openGeckoForm(id){ const g=id?geckos[id]:null; if(g&&g.planned){ openGh
       <div class="pastebox" id="f-paste" hidden><p>Your app did not open the photo picker. Two options:</p><ol><li>Copy the photo from your gallery, press and hold this box and choose <b>Paste</b>:<input type="text" id="f-pastein" inputmode="none" placeholder="Press and hold here, then paste" autocomplete="off"></li><li>Open this board in your browser. The button works there and everything stays in sync.</li></ol></div>
       <label class="fld"><span>Name</span><input type="text" id="f-name" maxlength="40" placeholder="Yoshi" value="${esc(g?g.name:'')}"></label>
       <div class="fld"><span>Sex</span><div class="seg">
-        <input type="radio" name="sx" id="sx-M" value="M"${sex==='M'?' checked':''}><label for="sx-M">♂ Male</label>
-        <input type="radio" name="sx" id="sx-F" value="F"${sex==='F'?' checked':''}><label for="sx-F">♀ Female</label>
+        <input type="radio" name="sx" id="sx-M" value="M"${sex==='M'?' checked':''}><label for="sx-M"><svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="male"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L20 4M14.5 4H20v5.5"/></svg> Male</label>
+        <input type="radio" name="sx" id="sx-F" value="F"${sex==='F'?' checked':''}><label for="sx-F"><svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="female"><circle cx="12" cy="9" r="6"/><path d="M12 15v7M8.5 18.5h7"/></svg> Female</label>
         <input type="radio" name="sx" id="sx-U" value="U"${sex==='U'?' checked':''}><label for="sx-U">Unsexed</label></div>
-        <label class="chk" style="margin-top:4px"><input type="checkbox" id="f-sure"${g&&g.sexSure===false?' checked':''}> Probable sex, not yet confirmed (♂? / ♀?)</label></div>
+        <label class="chk" style="margin-top:4px"><input type="checkbox" id="f-sure"${g&&g.sexSure===false?' checked':''}> Probable sex, not yet confirmed (<svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="male"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L20 4M14.5 4H20v5.5"/></svg>? / <svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="female"><circle cx="12" cy="9" r="6"/><path d="M12 15v7M8.5 18.5h7"/></svg>?)</label></div>
       <label class="fld"><span>Morph / traits</span><input type="text" id="f-morph" list="morphs" maxlength="80" placeholder="Red Phantom Lw, Charcoal het Axanthic…" value="${esc(g?g.morph||'':'')}"></label>
       <div class="row2">
         <label class="fld"><span>Hatch date</span><input type="date" id="f-birth" max="${today()}" value="${esc(g?g.birth||'':'')}"></label>
@@ -964,9 +968,9 @@ function openGeckoForm(id){ const g=id?geckos[id]:null; if(g&&g.planned){ openGh
 /* ---------- export ---------- */
 const PL={addBaby:'Add planned baby',badge:'PLANNED',notHatched:'Not hatched yet',noMorph:'Genetics to be decided',plannedTag:' (planned)',grand:'Grandparents',
   babyName:(m,f)=>`${m} × ${f} baby`,added:n=>`${n} added under the pair.`,plannedSub:'Planned baby',fromParents:'What it can inherit from its parents',
-  name:'Name',sex:'Sex',male:'♂ Male',female:'♀ Female',either:'Either',morph:'Expected genetics',morphHint:'Filled in from the parents. “poss” = possible. Change it to match the baby you plan to keep.',
+  name:'Name',sex:'Sex',male:'<svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="male"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L20 4M14.5 4H20v5.5"/></svg> Male',female:'<svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="female"><circle cx="12" cy="9" r="6"/><path d="M12 15v7M8.5 18.5h7"/></svg> Female',either:'Either',morph:'Expected genetics',morphHint:'Filled in from the parents. “poss” = possible. Change it to match the baby you plan to keep.',
   notes:'Notes',save:'Save',saved:'Planned baby saved.',hatched:'It hatched! Move it to the collection',hatchedToast:n=>`${n} is now in your collection. Finish its profile.`,
-  removeBaby:'Delete this planned baby',removed:'Planned baby deleted.',group:y=>`Hatchlings ${y}`,juvCat:'JUVENILE',either2:'♂/♀',
+  removeBaby:'Delete this planned baby',removed:'Planned baby deleted.',group:y=>`Hatchlings ${y}`,juvCat:'JUVENILE',either2:'<svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="male"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L20 4M14.5 4H20v5.5"/></svg>/<svg class="sxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="female"><circle cx="12" cy="9" r="6"/><path d="M12 15v7M8.5 18.5h7"/></svg>',
   possOne:n=>`Only if the baby turns out ${n}: 50% ${n}, 50% no gene.`,possLethal:n=>`If both turn out ${n}: 25% super (lethal). Check before pairing them.`,cousins:'cousins (shared grandparents)',grandkid:'grandparent and grandchild',
   csvTitle:'PLANNED BABIES',csvHead:['Name','Sire','Dam','Sex','Expected genetics','Board'],sexCsv:{M:'♂',F:'♀',U:'either'},
   helpBaby:'Tap a pair’s line → “Add planned baby” to create a baby that has not hatched yet. It appears under its parents with a family line. Pair planned babies from different pairs to plan your second generation; the app warns you if they are related. When it hatches, tap it → “It hatched!”.',
@@ -983,7 +987,7 @@ function expectedMorph(a,b){ const t=[]; GENES.forEach(gene=>{ const sa=geneStat
 function grandRow(g){ const parts=[g.padre,g.madre].map(pid=>{ const p=geckos[pid]; if(!p||!(p.padre||p.madre)) return ''; return `${esc(p.name)}: ${esc(parentName(p.padre)||'?')} × ${esc(parentName(p.madre)||'?')}`; }).filter(Boolean);
   return parts.length?`<dt>${PL.grand}</dt><dd>${parts.join('<br>')}</dd>`:''; }
 function ghostHTML(n,g){ const c=g.sex==='M'?'m':g.sex==='F'?'f':'u'; const iss=nodeIssue(n);
-  return `<div class="node plan ${c}" data-id="${esc(n.id)}" style="left:${n.x}px;top:${n.y}px"><div class="ph gph">${IC.egg}<span class="sx">${g.sex==='U'?PL.either2:SX[g.sex]}</span>${iss?`<span class="wb ${iss}">!</span>`:''}<span class="vis cat">${PL.badge}</span></div>
+  return `<div class="node plan ${c}" data-id="${esc(n.id)}" style="left:${n.x}px;top:${n.y}px"><div class="ph gph">${IC.egg}<span class="sx">${g.sex==='U'?PL.either2:SXH[g.sex]}</span>${iss?`<span class="wb ${iss}">!</span>`:''}<span class="vis cat">${PL.badge}</span></div>
     <div class="meta"><b>${esc(g.name)}</b><span class="mo">${esc(g.morph||PL.noMorph)}</span><span>${PL.notHatched}</span></div></div>`; }
 function famLines(){ let h=''; board.nodes.forEach(n=>{ const g=gOf(n); if(!g||!g.padre||!g.madre) return; let L=n.from&&board.links.find(x=>x.id===n.from);
     if(!L) L=board.links.find(x=>x.k==='pair'&&gOf(nodeById(x.m))?.id===g.padre&&gOf(nodeById(x.f))?.id===g.madre);
